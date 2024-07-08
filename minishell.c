@@ -542,6 +542,36 @@ void handle_sigint(int sig)
     g_data.exit_status = 130; // Fix: g_data is not a pointer, so use dot operator instead of arrow operator
 }
 
+void print_data(t_data *data) {
+    int i;
+
+    // Print command
+    if (data->cmd) {
+        printf("Command:\n");
+        i = 0;
+        while (data->cmd->argv[i] != NULL) {
+            printf(" argv[%d]: %s\n", i, data->cmd->argv[i]);
+            i++;
+        }
+    }
+
+    // Print environment variables
+    // t_env_node *env = data->env_list;
+    // printf("Environment Variables:\n");
+    // while (env) {
+    //     printf(" %s=%s\n", env->name, env->value);
+    //     env = env->next;
+    // }
+
+    // Print other fields
+    printf("Exit Status: %d\n", data->exit_status);
+    printf("Argument Count: %d\n", data->ac);
+    printf("Arguments:\n");
+    for (i = 0; i < data->ac; i++) {
+        printf(" av[%d]: %s\n", i, data->av[i]);
+    }
+}
+
 int main(int argc, char **argv, char **envp)
 {
     Token   tokens[MAX_TOKENS];
@@ -556,8 +586,8 @@ int main(int argc, char **argv, char **envp)
         perror("malloc");
         return EXIT_FAILURE;
     }
-    data->ac = argc;
-    data->av = argv;
+    (void)argc;
+    (void)argv;
     data->exit_status = 0;
     data->env_list = create_env_list(envp);
 
@@ -580,6 +610,8 @@ int main(int argc, char **argv, char **envp)
         }
         cmd = parse(tokens);
         data->cmd = cmd;
+        data->ac = ft_size(cmd->argv);
+        data->av = cmd->argv;;
         if (!data->cmd)
         {
             free(line);
