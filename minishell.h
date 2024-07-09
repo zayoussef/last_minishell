@@ -103,6 +103,7 @@ typedef struct s_data
     int         pipe_errors;
     int         exit_status;
     int         exit_signal;
+    char           *test;
 } t_data;
 
 extern t_data g_data;
@@ -115,6 +116,8 @@ typedef struct
     int buffer_index;
 } QuoteWordParserState;
 
+
+t_data *get_global_data(void);
 void open_pipe(t_data *data);
 void wating_processes(t_data *data, int *status);
 void output_fd(t_data *data);

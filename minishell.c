@@ -12,8 +12,6 @@
 
 #include "minishell.h"
 
-#define MAX_INPUT_LENGTH 1024
-
 t_data g_data;
 
 void free_split(char **arr)
@@ -29,6 +27,8 @@ void free_split(char **arr)
         free(arr);
     }
 }
+
+
 
 char	*build_executable_path(char *path, char *cmd)
 {
@@ -379,6 +379,7 @@ void run_execution(t_data *data)
         free(data->cmd);
 		free(exec_path);
         data->exit_status = 127;
+        g_data.test = ("hello test!");
 		exit(127);
 	}
 	else
@@ -542,34 +543,10 @@ void handle_sigint(int sig)
     g_data.exit_status = 130; // Fix: g_data is not a pointer, so use dot operator instead of arrow operator
 }
 
-void print_data(t_data *data) {
-    int i;
-
-    // Print command
-    if (data->cmd) {
-        printf("Command:\n");
-        i = 0;
-        while (data->cmd->argv[i] != NULL) {
-            printf(" argv[%d]: %s\n", i, data->cmd->argv[i]);
-            i++;
-        }
-    }
-
-    // Print environment variables
-    // t_env_node *env = data->env_list;
-    // printf("Environment Variables:\n");
-    // while (env) {
-    //     printf(" %s=%s\n", env->name, env->value);
-    //     env = env->next;
-    // }
-
-    // Print other fields
-    printf("Exit Status: %d\n", data->exit_status);
-    printf("Argument Count: %d\n", data->ac);
-    printf("Arguments:\n");
-    for (i = 0; i < data->ac; i++) {
-        printf(" av[%d]: %s\n", i, data->av[i]);
-    }
+t_data *get_global_data(void)
+{
+    g_data.exit_status = 0;
+    return &g_data;
 }
 
 int main(int argc, char **argv, char **envp)
@@ -579,18 +556,18 @@ int main(int argc, char **argv, char **envp)
     t_data  *data;
     char    *line;
     int     nb_token;
+    int     exit_status;
 
-    data = malloc(sizeof(t_data));
-    if (!data)
-    {
-        perror("malloc");
-        return EXIT_FAILURE;
-    }
+    // data = malloc(sizeof(t_data *));
+    // if (!data)
+    // {
+    //     perror("malloc");
+    //     return EXIT_FAILURE;
+    // }
     (void)argc;
     (void)argv;
-    data->exit_status = 0;
+    data = get_global_data();
     data->env_list = create_env_list(envp);
-
     while (1)
     {
         signal(SIGINT, handle_sigint);
@@ -604,14 +581,14 @@ int main(int argc, char **argv, char **envp)
         lex(line, tokens, &nb_token);
         if (check_syntaxe(tokens, nb_token))
         {
-            printf("Syntax error\n");
+            // printf("Syntax error\n");
             free(line);
             continue;
         }
         cmd = parse(tokens);
         data->cmd = cmd;
         data->ac = ft_size(cmd->argv);
-        data->av = cmd->argv;;
+        data->av = cmd->argv;
         if (!data->cmd)
         {
             free(line);
@@ -625,8 +602,8 @@ int main(int argc, char **argv, char **envp)
         free(line);
         free_all_resources(cmd);
     }
-    int exit_status = data->exit_status;
+    exit_status = data->exit_status;
     free_env_list(data->env_list);
-    free(data);
-    return exit_status;
+    // free(data);
+    return (exit_status);
 }

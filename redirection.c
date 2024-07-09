@@ -7,7 +7,6 @@ void add_token(Token *tokens, int *num_tokens, TokenType type, char *value)
     (*num_tokens)++;
 }
 
-
 void skip_whitespace(const char **p) 
 {
     while (ft_isspace(**p)) (*p)++;
@@ -45,7 +44,8 @@ void handle_redirection(Token *tokens, int *i, Command **current)
     }
     Redirection *redir ;
     redir = (Redirection *)malloc(sizeof(Redirection));
-    if (!redir) return; // Handle malloc failure
+    if (!redir)
+        return; // Handle malloc failure
     redir->type = tokens[*i].type;
     redir->filename = tokens[++(*i)].value;
     redir->next = NULL;
