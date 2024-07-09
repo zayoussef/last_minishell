@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 21:36:21 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/09 15:33:03 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/09 19:29:38 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,14 @@ int check_ambiguous_unexpected_tokens(Token *tokens,int i)
         {
             return (printf("Syntax error: unexpected token 1 '&'\n"),1);
         }
-        if((tokens[i].type == TOKEN_APPEND_OUT || tokens[i].type == TOKEN_REDIRECT_IN || tokens[i].type == TOKEN_REDIRECT_IN) 
+        if((tokens[i].type == TOKEN_APPEND_OUT || tokens[i].type == TOKEN_REDIRECT_OUT || tokens[i].type == TOKEN_REDIRECT_IN) 
         && !ft_strcmp(tokens[i + 1].value,"#"))
         {
             return (printf("minishell: $: ambigios error\n"),1);
         }
         if((tokens[i].type == TOKEN_HERE_DOC && tokens[i + 1].type != TOKEN_WORD) ||
         (tokens[i].type == TOKEN_REDIRECT_IN && tokens[i + 1].type != TOKEN_WORD ) ||
-        (tokens[i].type == TOKEN_REDIRECT_IN && tokens[i + 1].type != TOKEN_WORD) ||
+        (tokens[i].type == TOKEN_REDIRECT_OUT && tokens[i + 1].type != TOKEN_WORD) ||
     (tokens[i].type == TOKEN_APPEND_OUT && tokens[i + 1].type != TOKEN_WORD))
         {
             return (printf("Syntax error: near unexpected token 2 '%s'\n", tokens[i].value),1);
@@ -117,7 +117,7 @@ Command* parse(Token *tokens) {
             add_command_to_list(&head, current);
             current = create_command(); // Start a new command
             if (!current) return head; // Handle memory allocation failure
-        } else if (tokens[i].type == TOKEN_REDIRECT_IN || tokens[i].type == TOKEN_REDIRECT_IN 
+        } else if (tokens[i].type == TOKEN_REDIRECT_IN || tokens[i].type == TOKEN_REDIRECT_OUT 
                 || tokens[i].type == TOKEN_APPEND_OUT || tokens[i].type == TOKEN_HERE_DOC) {
             handle_redirection(tokens, &i, &current);
             flag++;
