@@ -137,27 +137,71 @@ char **list_to_char(t_env_node *env_list)
     return (env_array);
 }
 
-void	run_exe(Command *cmd, t_data *data)
-{
-	char	*exec_path;
+// void	run_exe(Command *cmd, t_data *data)
+// {
+// 	char	*exec_path;
 
-	data->env = list_to_char(data->env_list);
-	exec_path = find_path(cmd->argv[0], data->env);
-	if (exec_path == NULL)
-	{
-		ft_putstr_fd("minishell: command not found: ", 2);
-		ft_putstr_fd(cmd->argv[0], 2);
-		ft_putchar_fd('\n', 2);
-		clear_tab(cmd->argv);
-		free(exec_path);
-		exit(127);
-	}
-	else
-	{
-		execve(exec_path, cmd->argv, data->env);
-		perror("minishell");
-		exit(127);
-	}
+// 	data->env = list_to_char(data->env_list);
+// 	exec_path = find_path(cmd->argv[0], data->env);
+// 	if (exec_path == NULL)
+// 	{
+// 		ft_putstr_fd("minishell: command not found: ", 2);
+// 		ft_putstr_fd(cmd->argv[0], 2);
+// 		ft_putchar_fd('\n', 2);
+// 		clear_tab(cmd->argv);
+// 		free(exec_path);
+// 		exit(127);
+// 	}
+// 	else
+// 	{
+// 		execve(exec_path, cmd->argv, data->env);
+// 		perror("minishell");
+// 		exit(127);
+// 	}
+// }
+
+void run_exe(Command *cmd, t_data *data) 
+{
+    char *exec_path;
+    int fd;
+
+    // Set up environment for execution
+    data->env = list_to_char(data->env_list);
+    exec_path = find_path(cmd->argv[0], data->env);
+
+    if (exec_path == NULL) {
+        ft_putstr_fd("minishell: command not found: ", 2);
+        ft_putstr_fd(cmd->argv[0], 2);
+        ft_putchar_fd('\n', 2);
+        clear_tab(data->env);
+        exit(127);
+    }
+
+    // Handle output redirection if present
+    if (cmd->output) {
+        fd = open(cmd->output->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fd == -1) {
+            perror("open");
+            clear_tab(data->env);
+            free(exec_path);
+            exit(EXIT_FAILURE);
+        }
+        if (dup2(fd, STDOUT_FILENO) == -1) {
+            perror("dup2");
+            close(fd);
+            clear_tab(data->env);
+            free(exec_path);
+            exit(EXIT_FAILURE);
+        }
+        close(fd);
+    }
+
+    // Execute the command
+    execve(exec_path, cmd->argv, data->env);
+    perror("minishell");
+    clear_tab(data->env);
+    free(exec_path);
+    exit(127);
 }
 
 
@@ -379,7 +423,6 @@ void run_execution(t_data *data)
         free(data->cmd);
 		free(exec_path);
         data->exit_status = 127;
-        g_data.test = ("hello test!");
 		exit(127);
 	}
 	else
@@ -513,12 +556,11 @@ void wating_processes(t_data *data, int *status)
         data->exit_status = WEXITSTATUS(*status);
     else if (WIFSIGNALED(*status))
     {
-        int sg = WTERMSIG(*status);
-        if (sg == SIGQUIT)
-            ft_putstr_fd("Quit: 3\n", 2);
-        else if (sg == SIGINT)
+        if (WTERMSIG(*status) == SIGQUIT)
+            ft_putstr_fd("Quit (core dumped)\n", 2);
+        else if (WTERMSIG(*status) == SIGINT)
             ft_putstr_fd("\n", 2);
-        data->exit_status = 128 + sg;
+        data->exit_status = 128 + (*status);
     }
 }
 
@@ -578,12 +620,12 @@ int main(int argc, char **argv, char **envp)
         if (strlen(line) > 0)
             add_history(line);
         nb_token = 0;
-        lex(line, tokens, &nb_token);
+        lex(line, tokens, &nb_token,data->env_list);
         if (check_syntaxe(tokens, nb_token))
         {
             // printf("Syntax error\n");
             free(line);
-            continue;
+            continue ;
         }
         cmd = parse(tokens);
         data->cmd = cmd;
@@ -592,7 +634,7 @@ int main(int argc, char **argv, char **envp)
         if (!data->cmd)
         {
             free(line);
-            continue;
+            continue ;
         }
         open_redirections(data->cmd);
         while (data->cmd && data->cmd->argv[0] == NULL)

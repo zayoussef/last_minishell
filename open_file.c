@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/07/08 16:52:27 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/09 15:23:09 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,13 @@ void open_redirections(Command *cmd)
         while(cmd->append_output != NULL) 
         {
             cmd->append_output->fd = open(cmd->append_output->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
-        if (cmd->append_output->fd == -1)
-        {
-            perror("Failed to open append output file");
-            break;
-        }
-        cmd->append_output = cmd->append_output->next;
+            if (cmd->append_output->fd == -1)
+            {
+                perror("Failed to open append output file");
+                break;
+            }
+            cmd->append_output = cmd->append_output->next;
         }
         cmd = cmd->next;
-        }
+    }
 }

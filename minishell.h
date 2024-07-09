@@ -103,7 +103,6 @@ typedef struct s_data
     int         pipe_errors;
     int         exit_status;
     int         exit_signal;
-    char           *test;
 } t_data;
 
 extern t_data g_data;
@@ -114,10 +113,9 @@ typedef struct
     char quote_char;
     char buffer[1024];
     int buffer_index;
+    t_env_node *env;
 } QuoteWordParserState;
 
-
-t_data *get_global_data(void);
 void open_pipe(t_data *data);
 void wating_processes(t_data *data, int *status);
 void output_fd(t_data *data);
@@ -129,7 +127,7 @@ void init_command(Command *cmd) ;
 Command* parse(Token *tokens);
 
 /********************lex**************************/
-void lex(const char *input, Token *tokens, int *num_tokens);
+void lex(const char *input, Token *tokens, int *num_tokens,t_env_node *env);
 void handle_special_characters(const char **p, Token *tokens, int *num_tokens);
 void handle_v2(const char **p,char *special,TokenType *type);
 void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens, QuoteWordParserState *state) ;

@@ -17,14 +17,14 @@ void handle_quotes_and_wordsv2(const char **p,QuoteWordParserState **state)
             }
 }
 
-char* expand_variable(const char *start, int length) 
+char* expand_variable(const char *start, int length,t_env_node *env) 
 {
     char varname[length + 1];
     char *value;
     
     ft_strncpy(varname, start, length);
     varname[length] = '\0';
-    value = getenv(varname);
+    value = ft_getenv(env,varname);
     if(value) return ft_strdup(value);
     else
         return(ft_strdup("")); // Return empty string if variable is not found
@@ -77,7 +77,7 @@ void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens, Quo
             }           
             while (ft_isalnum(**p) || **p == '_') (*p)++;
             if (*p > start) {
-                expanded_value = expand_variable(start, *p - start);
+                expanded_value = expand_variable(start, *p - start,state->env);
                 //add_token(tokens, num_tokens, TOKEN_WORD, expanded_value);
                 if (is_ambiguous(expanded_value) && *num_tokens > 0 && (tokens[*num_tokens - 1].type == TOKEN_REDIRECT_OUT 
                 ||tokens[*num_tokens - 1].type == TOKEN_APPEND_OUT || tokens[*num_tokens - 1].type == TOKEN_REDIRECT_IN)) {
@@ -182,7 +182,7 @@ void handle_special_characters(const char **p, Token *tokens, int *num_tokens)
     }
 }
 
-void lex(const char *input, Token *tokens, int *num_tokens)
+void lex(const char *input, Token *tokens, int *num_tokens,t_env_node *env)
 {
     const char *p ;
     p = input;
@@ -190,6 +190,7 @@ void lex(const char *input, Token *tokens, int *num_tokens)
     state.in_quotes = 0;
     state.quote_char = '\0';
     state.buffer_index = 0;
+    state.env = env;
     ft_memset(state.buffer, 0, sizeof(state.buffer));
 
     while (*p) 
