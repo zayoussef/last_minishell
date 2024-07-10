@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-void add_token(Token *tokens, int *num_tokens, TokenType type, char *value) 
+void add_token(Token *tokens, int *num_tokens, TokenType type, char *value)
 {
     tokens[*num_tokens].type = type;
     tokens[*num_tokens].value = ft_strdup(value);
@@ -9,7 +9,8 @@ void add_token(Token *tokens, int *num_tokens, TokenType type, char *value)
 
 void skip_whitespace(const char **p) 
 {
-    while (ft_isspace(**p)) (*p)++;
+    while (ft_isspace(**p))
+        (*p)++;
 }
 
 void next_type(Redirection **redir,Command **current)
@@ -19,7 +20,7 @@ void next_type(Redirection **redir,Command **current)
         (*redir)->next = (*current)->input;
         (*current)->input = (*redir);
     }
-     else if ((*redir)->type == TOKEN_REDIRECT_OUT)
+    else if ((*redir)->type == TOKEN_REDIRECT_OUT)
     {
         (*redir)->next = (*current)->output;
         (*current)->output = (*redir);
@@ -38,11 +39,12 @@ void next_type(Redirection **redir,Command **current)
 
 void handle_redirection(Token *tokens, int *i, Command **current) 
 {
-    if (*current == NULL||!current) 
+    Redirection *redir;
+
+    if (*current == NULL || !current)
     {
         *current = create_command();
     }
-    Redirection *redir ;
     redir = (Redirection *)malloc(sizeof(Redirection));
     if (!redir)
         return; // Handle malloc failure

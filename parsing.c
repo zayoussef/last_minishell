@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 21:36:21 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/09 15:33:03 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/10 18:06:11 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,14 @@ int check_ambiguous_unexpected_tokens(Token *tokens,int i)
         {
             return (printf("Syntax error: unexpected token 1 '&'\n"),1);
         }
-        if((tokens[i].type == TOKEN_APPEND_OUT || tokens[i].type == TOKEN_REDIRECT_IN || tokens[i].type == TOKEN_REDIRECT_IN) 
+        if((tokens[i].type == TOKEN_APPEND_OUT || tokens[i].type == TOKEN_REDIRECT_OUT || tokens[i].type == TOKEN_REDIRECT_IN) 
         && !ft_strcmp(tokens[i + 1].value,"#"))
         {
             return (printf("minishell: $: ambigios error\n"),1);
         }
         if((tokens[i].type == TOKEN_HERE_DOC && tokens[i + 1].type != TOKEN_WORD) ||
         (tokens[i].type == TOKEN_REDIRECT_IN && tokens[i + 1].type != TOKEN_WORD ) ||
-        (tokens[i].type == TOKEN_REDIRECT_IN && tokens[i + 1].type != TOKEN_WORD) ||
-    (tokens[i].type == TOKEN_APPEND_OUT && tokens[i + 1].type != TOKEN_WORD))
+        (tokens[i].type == TOKEN_REDIRECT_OUT && tokens[i + 1].type != TOKEN_WORD) || (tokens[i].type == TOKEN_APPEND_OUT && tokens[i + 1].type != TOKEN_WORD))
         {
             return (printf("Syntax error: near unexpected token 2 '%s'\n", tokens[i].value),1);
         }   
@@ -96,41 +95,53 @@ int check_syntaxe(Token *tokens,int nb_tokens)
     return 0;
 }
 
-
-
-Command* parse(Token *tokens) {
+Command* parse(Token *tokens) 
+{
     Command *head = NULL;
     Command *current;
     int flag;
     int argc;
     int i;
     current = create_command();
-    if (!current) return NULL; // Handle memory allocation failure
+    if (!current)
+        return NULL; // Handle memory allocation failure
     flag = 0;
     argc = 0;
     i = 0;
-    while (tokens[i].type != TOKEN_END) {
-        if (tokens[i].type == TOKEN_WORD) {
+    while (tokens[i].type != TOKEN_END) 
+    {
+        if (tokens[i].type == TOKEN_WORD) 
+        {
             handle_word(tokens, &i, &current, &argc);
-        } else if (tokens[i].type == TOKEN_PIPE || tokens[i].type == TOKEN_AND) {
+        }
+        else if (tokens[i].type == TOKEN_PIPE || tokens[i].type == TOKEN_AND) 
+        {
             finalize_command(&current, &argc);
             add_command_to_list(&head, current);
             current = create_command(); // Start a new command
-            if (!current) return head; // Handle memory allocation failure
-        } else if (tokens[i].type == TOKEN_REDIRECT_IN || tokens[i].type == TOKEN_REDIRECT_IN 
-                || tokens[i].type == TOKEN_APPEND_OUT || tokens[i].type == TOKEN_HERE_DOC) {
+            if (!current)
+                return head; // Handle memory allocation failure
+        }
+        else if (tokens[i].type == TOKEN_REDIRECT_IN || tokens[i].type == TOKEN_REDIRECT_OUT 
+                || tokens[i].type == TOKEN_APPEND_OUT || tokens[i].type == TOKEN_HERE_DOC)
+        {
             handle_redirection(tokens, &i, &current);
             flag++;
-        } else if ((tokens[i].type == TOKEN_LPR && tokens[i + 1].type == TOKEN_WORD )
-        || (tokens[i].type == TOKEN_RPR && tokens[i - 1].type == TOKEN_WORD)) {
+        }
+        else if ((tokens[i].type == TOKEN_LPR && tokens[i + 1].type == TOKEN_WORD ) 
+            || (tokens[i].type == TOKEN_RPR && tokens[i - 1].type == TOKEN_WORD))
+        {
             flag++;
-        } else {
+        }
+        else 
+        {
             write(2, "minishell: syntax error near unexpected token  newline\n", 54);
             return (free_all_resources(current), NULL);
         }
         i++;
     }
-    if (current && (argc > 0 || flag > 0)) { // Check if there's anything in the current command
+    if (current && (argc > 0 || flag > 0)) 
+    { // Check if there's anything in the current command
         finalize_command(&current, &argc);
         add_command_to_list(&head, current);
     }

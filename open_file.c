@@ -6,51 +6,64 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/07/09 15:23:09 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/10 21:00:50 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void redirection_in_out(Command *cmd)
+int redirection_in_out(t_data *data) 
 {
-    while(cmd->input != NULL) 
+    Redirection *redir;
+
+    redir = data->cmd->input;
+    while (redir != NULL) 
     {
-        cmd->input->fd = open(cmd->input->filename, O_RDONLY);
-        if (cmd->input->fd == -1)
+        redir->fd = open(redir->filename, O_RDONLY);
+        if (redir->fd == -1) 
         {
-            perror("Failed to open input file");
-            break;
+            ft_putstr_fd("bash: test: Permission denied\n", 2);
+            return -1;  // Return error code
         }
-        cmd->input = cmd->input->next;
+        redir = redir->next;
     }
-    while(cmd->output != NULL) 
+
+    redir = data->cmd->output;
+    while (redir != NULL) 
     {
-        cmd->output->fd = open(cmd->output->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (cmd->output->fd == -1)
+        redir->fd = open(redir->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (redir->fd == -1) 
         {
-            perror("Failed to open output file");
-            break;
+            ft_putstr_fd("bash: test: Permission denied\n", 2);
+            return -1;  // Return error code
         }
-        cmd->output = cmd->output->next;
+        redir = redir->next;
     }
+    return 0;  // Return success code
 }
 
-void open_redirections(Command *cmd) 
+int open_redirections(t_data *data)
 {
-    while(cmd != NULL)
+    Command *current_cmd;
+    Redirection *redir;
+    
+    current_cmd = data->cmd;
+    while (current_cmd != NULL)
     {
-        redirection_in_out(cmd);
-        while(cmd->append_output != NULL) 
+        // redirection_in_out(data);
+        redir = data->cmd->append_output;
+        while (redir != NULL)
         {
-            cmd->append_output->fd = open(cmd->append_output->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
-            if (cmd->append_output->fd == -1)
+            redir->fd = open(redir->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+            if (redir->fd == -1)
             {
-                perror("Failed to open append output file");
-                break;
+                ft_putstr_fd("bash: test: Permission denied\n", 2);
+                return -1;
             }
-            cmd->append_output = cmd->append_output->next;
+            redir = redir->next;
         }
-        cmd = cmd->next;
+
+        current_cmd = current_cmd->next;
     }
+    return 0;
 }

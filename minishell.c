@@ -28,8 +28,6 @@ void free_split(char **arr)
     }
 }
 
-
-
 char	*build_executable_path(char *path, char *cmd)
 {
 	char	*tmp_path;
@@ -111,99 +109,52 @@ char **list_to_char(t_env_node *env_list)
 {
     t_env_node  *cur;
     char        **env_array;
-    int         count;
-    int         i;
+    char        *temp;
+    int         count = 0;
+    int         i = 0;
 
+    // Count the number of environment variables
     cur = env_list;
-    count = 0;
-    i = 0;
     while (cur)
     {
         count++;
         cur = cur->next;
     }
+
+    // Allocate memory for the environment array
     env_array = (char **)malloc(sizeof(char *) * (count + 1));
     if (!env_array)
         return (NULL);
+
+    // Build the environment array
     cur = env_list;
     while (cur)
     {
-        env_array[i] = ft_strjoin(cur->name, "=");
-        env_array[i] = ft_strjoin(env_array[i], cur->value);
+        temp = ft_strjoin(cur->name, "="); // Create the key=value string
+        if (!temp)
+        {  // Check if the memory allocation failed
+            // Free previously allocated strings and the array
+            while (i > 0)
+                free(env_array[--i]);
+            free(env_array);
+            return NULL;
+        }
+        env_array[i] = ft_strjoin(temp, cur->value);  // Append the value
+        free(temp);  // Free the temporary string
+        if (!env_array[i])
+        {  // Check if the memory allocation failed
+            // Free previously allocated strings and the array
+            while (i > 0)
+                free(env_array[--i]);
+            free(env_array);
+            return NULL;
+        }
         i++;
         cur = cur->next;
     }
-    env_array[i] = NULL;
-    return (env_array);
+    env_array[i] = NULL;  // Null-terminate the array
+    return env_array;
 }
-
-// void	run_exe(Command *cmd, t_data *data)
-// {
-// 	char	*exec_path;
-
-// 	data->env = list_to_char(data->env_list);
-// 	exec_path = find_path(cmd->argv[0], data->env);
-// 	if (exec_path == NULL)
-// 	{
-// 		ft_putstr_fd("minishell: command not found: ", 2);
-// 		ft_putstr_fd(cmd->argv[0], 2);
-// 		ft_putchar_fd('\n', 2);
-// 		clear_tab(cmd->argv);
-// 		free(exec_path);
-// 		exit(127);
-// 	}
-// 	else
-// 	{
-// 		execve(exec_path, cmd->argv, data->env);
-// 		perror("minishell");
-// 		exit(127);
-// 	}
-// }
-
-void run_exe(Command *cmd, t_data *data) 
-{
-    char *exec_path;
-    int fd;
-
-    // Set up environment for execution
-    data->env = list_to_char(data->env_list);
-    exec_path = find_path(cmd->argv[0], data->env);
-
-    if (exec_path == NULL) {
-        ft_putstr_fd("minishell: command not found: ", 2);
-        ft_putstr_fd(cmd->argv[0], 2);
-        ft_putchar_fd('\n', 2);
-        clear_tab(data->env);
-        exit(127);
-    }
-
-    // Handle output redirection if present
-    if (cmd->output) {
-        fd = open(cmd->output->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (fd == -1) {
-            perror("open");
-            clear_tab(data->env);
-            free(exec_path);
-            exit(EXIT_FAILURE);
-        }
-        if (dup2(fd, STDOUT_FILENO) == -1) {
-            perror("dup2");
-            close(fd);
-            clear_tab(data->env);
-            free(exec_path);
-            exit(EXIT_FAILURE);
-        }
-        close(fd);
-    }
-
-    // Execute the command
-    execve(exec_path, cmd->argv, data->env);
-    perror("minishell");
-    clear_tab(data->env);
-    free(exec_path);
-    exit(127);
-}
-
 
 void	check_file_cmd1(Command *cmd)
 {
@@ -457,8 +408,33 @@ void run_child(t_data *data, int *status)
     {
         close_if_not_standard_fd(data->fdin, 0);
         data->env = list_to_char(data->env_list);
+        if (cmd->input && cmd->input->fd != -1)
+            input_redirection(data);
+        else if (cmd->output && cmd->output->fd != -1)
+            output_redirection(data);
         run_execution(data);
     }
+}
+
+void input_redirection(t_data *data)
+{
+    if (dup2(data->cmd->input->fd, STDIN_FILENO) == -1)
+    {
+        perror("dup2");
+        exit(EXIT_FAILURE);
+    }
+    close(data->cmd->input->fd);
+}
+
+
+void output_redirection(t_data *data)
+{
+    if (dup2(data->cmd->output->fd, STDOUT_FILENO) == -1)
+    {
+        perror("dup 2");
+        exit(EXIT_FAILURE);
+    }
+        close(data->cmd->output->fd);
 }
 
 void execute_fork(t_data *data, int *status)
@@ -485,6 +461,8 @@ void execute_fork(t_data *data, int *status)
                 exit(130);
             tmp = tmp->next;
         }
+        if (open_redirections(data) == -1 || redirection_in_out(data) == -1)
+            exit(1);
         run_child(data, status);
         data->exit_status = *status;
         exit(data->exit_status); // Ensure child process exits with the correct status
@@ -494,7 +472,7 @@ void execute_fork(t_data *data, int *status)
 void execute_cmd(Command *cmds, t_data *data, int *status)
 {
     while (data->cmd && data->i < data->size_cmds)
-    { 
+    {
         data->cmd = cmds;
         if (cmds->input)
             data->in_file = cmds->input->fd;
@@ -591,6 +569,8 @@ t_data *get_global_data(void)
     return &g_data;
 }
 
+
+
 int main(int argc, char **argv, char **envp)
 {
     Token   tokens[MAX_TOKENS];
@@ -636,7 +616,7 @@ int main(int argc, char **argv, char **envp)
             free(line);
             continue ;
         }
-        open_redirections(data->cmd);
+        open_redirections(data);
         while (data->cmd && data->cmd->argv[0] == NULL)
             data->cmd = data->cmd->next;
         if (data->cmd)

@@ -21,6 +21,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "libft/libft.h"
@@ -116,7 +117,10 @@ typedef struct
     t_env_node *env;
 } QuoteWordParserState;
 
+void input_redirection(t_data *data);
+void output_redirection(t_data *data);
 void open_pipe(t_data *data);
+void setup_redirections(t_data *data);
 void wating_processes(t_data *data, int *status);
 void output_fd(t_data *data);
 void close_if_not_standard_fd(int fd, int standard_fd);
@@ -143,7 +147,8 @@ void free_all_resources(Command *head);
 void free_redirection(Redirection *redir) ;
 void free_all_v2(Command *current);
 /*****************************REIRECTION_OPEN_FILE*****************************************/
-void open_redirections(Command *cmd) ;
+int open_redirections(t_data *data);
+int redirection_in_out(t_data *data) ;
 /********************parsing_tools********************/
 void ft_strncpy(char *dest, const char *src, int n);
 /*****************builtins_utils*****************/

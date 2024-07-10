@@ -17,7 +17,7 @@ void handle_quotes_and_wordsv2(const char **p,QuoteWordParserState **state)
             }
 }
 
-char* expand_variable(const char *start, int length,t_env_node *env) 
+char* expand_variable(const char *start, int length, t_env_node *env) 
 {
     char varname[length + 1];
     char *value;
@@ -25,12 +25,14 @@ char* expand_variable(const char *start, int length,t_env_node *env)
     ft_strncpy(varname, start, length);
     varname[length] = '\0';
     value = ft_getenv(env,varname);
-    if(value) return ft_strdup(value);
+    if(value) 
+        return ft_strdup(value);
     else
         return(ft_strdup("")); // Return empty string if variable is not found
 }
 
-int is_ambiguous(const char *expanded_value) {
+int is_ambiguous(const char *expanded_value) 
+{
     // Check if the expanded value contains spaces or is empty
     return (strchr(expanded_value, ' ') != NULL || expanded_value[0] == '\0');
 }

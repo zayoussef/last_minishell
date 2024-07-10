@@ -21,23 +21,20 @@ Command* create_command()
 void add_command_to_list(Command **head, Command *current) 
 {
     if (*head == NULL) 
-    {
         *head = current;
-    } 
     else 
     {
         Command *last = *head;
-        while (last->next != NULL) 
-        {
+        while (last->next != NULL)
             last = last->next;
-        }
         last->next = current;
     }
 }
 
 void handle_word(Token *tokens, int *i, Command **current, int *argc) 
 {
-    if (*current == NULL) {
+    if (*current == NULL)
+    {
         *current = create_command();
         *argc = 0;
     }
