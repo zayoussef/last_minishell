@@ -6,7 +6,11 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 21:36:21 by yozainan          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2024/07/10 18:06:11 by yozainan         ###   ########.fr       */
+=======
+/*   Updated: 2024/07/09 19:29:38 by yozainan         ###   ########.fr       */
+>>>>>>> 61324e43a0cc9d07b0a1c46b1a3835903d07a05b
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +40,12 @@ int check_ambiguous_unexpected_tokens(Token *tokens,int i)
         }
         if((tokens[i].type == TOKEN_HERE_DOC && tokens[i + 1].type != TOKEN_WORD) ||
         (tokens[i].type == TOKEN_REDIRECT_IN && tokens[i + 1].type != TOKEN_WORD ) ||
+<<<<<<< HEAD
         (tokens[i].type == TOKEN_REDIRECT_OUT && tokens[i + 1].type != TOKEN_WORD) || (tokens[i].type == TOKEN_APPEND_OUT && tokens[i + 1].type != TOKEN_WORD))
+=======
+        (tokens[i].type == TOKEN_REDIRECT_OUT && tokens[i + 1].type != TOKEN_WORD) ||
+    (tokens[i].type == TOKEN_APPEND_OUT && tokens[i + 1].type != TOKEN_WORD))
+>>>>>>> 61324e43a0cc9d07b0a1c46b1a3835903d07a05b
         {
             return (printf("Syntax error: near unexpected token 2 '%s'\n", tokens[i].value),1);
         }   
@@ -119,12 +128,18 @@ Command* parse(Token *tokens)
             finalize_command(&current, &argc);
             add_command_to_list(&head, current);
             current = create_command(); // Start a new command
+<<<<<<< HEAD
             if (!current)
                 return head; // Handle memory allocation failure
         }
         else if (tokens[i].type == TOKEN_REDIRECT_IN || tokens[i].type == TOKEN_REDIRECT_OUT 
                 || tokens[i].type == TOKEN_APPEND_OUT || tokens[i].type == TOKEN_HERE_DOC)
         {
+=======
+            if (!current) return head; // Handle memory allocation failure
+        } else if (tokens[i].type == TOKEN_REDIRECT_IN || tokens[i].type == TOKEN_REDIRECT_OUT 
+                || tokens[i].type == TOKEN_APPEND_OUT || tokens[i].type == TOKEN_HERE_DOC) {
+>>>>>>> 61324e43a0cc9d07b0a1c46b1a3835903d07a05b
             handle_redirection(tokens, &i, &current);
             flag++;
         }
