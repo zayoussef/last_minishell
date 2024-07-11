@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 18:37:52 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/09 09:13:47 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/11 19:02:23 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,26 @@ t_env_node *find_env(t_env_node *env, const char *name)
     return NULL;
 }
 
+// void unset_env(char *arg, t_env_node **env)
+// {
+//     t_env_node *curr;
+
+//     if (!*env)
+//         return ;
+
+//     if (arg && !ft_isalpha(arg[0]) && arg[0] != '_')
+//     {
+//         printf("minishell: unset: `%s`: not a valid identifier\n", arg);
+//         g_data.exit_status = EXIT_FAILURE;
+//     }
+//     else
+//     {
+//         curr = find_env(*env, arg);
+//         if (curr)
+//             remov_env(env, curr);
+//     }
+// }
+
 void unset_env(char *arg, t_env_node **env)
 {
     t_env_node *curr;
@@ -53,17 +73,9 @@ void unset_env(char *arg, t_env_node **env)
     if (!*env)
         return ;
 
-    if (arg && !ft_isalpha(arg[0]) && arg[0] != '_')
-    {
-        printf("minishell: unset: `%s`: not a valid identifier\n", arg);
-        g_data.exit_status = EXIT_FAILURE;
-    }
-    else
-    {
-        curr = find_env(*env, arg);
-        if (curr)
-            remov_env(env, curr);
-    }
+    curr = find_env(*env, arg);
+    if (curr)
+        remov_env(env, curr);
 }
 
 void build_unset(t_data *data)
@@ -76,4 +88,5 @@ void build_unset(t_data *data)
         unset_env(data->av[i], &(data->env_list));
         i++;
     }
+    data->exit_status = 0;
 }

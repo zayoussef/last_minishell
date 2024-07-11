@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/09 09:13:47 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/11 18:17:12 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,28 @@
 void build_env(t_data *data)
 {
     t_env_node  *curr;
-   
-    curr  = data->env_list;
-    if (data->ac > 0)
+    int         fd;
+
+    fd = handle_redirection_and_errors(data);
+    if (fd == -1)
+        return ;
+    curr = data->env_list;
+    if (data->ac == 1)
     {
         while (curr)
         {
-            printf("%s=%s\n", curr->name, curr->value);
+            ft_putstr_fd(curr->name, fd);
+            ft_putstr_fd("=", fd);
+            ft_putstr_fd(curr->value, fd);
+            ft_putstr_fd("\n", fd);
             curr = curr->next;
         }
     }
     else
     {
-        printf("minishell: env: Too many arguments.\n");
-        g_data.exit_status = EXIT_FAILURE;
+        ft_putstr_fd("env: ‘", fd);
+        ft_putstr_fd(data->av[1], fd);
+        ft_putstr_fd("’: No such file or directory\n", fd);
+        data->exit_status = EXIT_FAILURE;
     }
 }

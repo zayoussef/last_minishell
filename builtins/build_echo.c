@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/09 18:50:32 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/11 16:36:34 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void check_option(char **av)
     print_av(av + i, 0);
 }
 
-// void   build_echo(char **av)
+// void   build_echo(t_data *data)
 // {
 //     // av++;
 //     if (av[1] == NULL)
@@ -69,33 +69,38 @@ void check_option(char **av)
 //         print_av(av + 1, 1);
 // }
 
-void build_echo(char **av)
+void build_echo(t_data *data)
 {
     int i;
     int newline;
+    int fd;
 
     i = 1;
     newline = 1;
-    if (av[i] && ft_strcmp(av[i], "-n") == 0)
+    fd = handle_redirection_and_errors(data);
+    if (fd == -1)
+        return ;
+    if (data->cmd->argv[i] && ft_strcmp(data->cmd->argv[i], "-n") == 0)
     {
         newline = 0;
         i++;
     }
-    while (av[i])
+    while (data->cmd->argv[i])
     {
-        if (ft_strcmp(av[i], "$?") == 0)
+        if (ft_strcmp(data->cmd->argv[i], "$?") == 0)
         {
-            printf("%d", g_data.exit_status);
-            g_data.exit_status = 0; // Reset exit_status after printing
+            ft_putnbr_fd(data->exit_status, fd);
+            data->exit_status = 0;
         }
         else
         {
-            printf("%s", av[i]);
+            ft_putstr_fd(data->cmd->argv[i], fd);
         }
-        if (av[i + 1])
-            printf(" ");
+        if (data->cmd->argv[i + 1])
+            ft_putstr_fd(" ", fd);
         i++;
     }
     if (newline)
-        printf("\n");
+        ft_putstr_fd("\n", fd);
+    data->exit_status = 0;
 }

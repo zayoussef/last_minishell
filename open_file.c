@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/07/10 21:00:50 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/11 10:35:16 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,12 @@ int redirection_in_out(t_data *data)
     while (redir != NULL) 
     {
         redir->fd = open(redir->filename, O_RDONLY);
-        if (redir->fd == -1) 
+        if (redir->fd == -1)
         {
-            ft_putstr_fd("bash: test: Permission denied\n", 2);
-            return -1;  // Return error code
+            ft_putstr_fd("minishell: ", 2);
+            ft_putstr_fd(redir->filename, 2);
+            perror(" ");
+            return -1;
         }
         redir = redir->next;
     }
@@ -34,12 +36,14 @@ int redirection_in_out(t_data *data)
         redir->fd = open(redir->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
         if (redir->fd == -1) 
         {
-            ft_putstr_fd("bash: test: Permission denied\n", 2);
-            return -1;  // Return error code
+            ft_putstr_fd("minishell: ", 2);
+            ft_putstr_fd(redir->filename, 2);
+            perror(" ");
+            return -1;
         }
         redir = redir->next;
     }
-    return 0;  // Return success code
+    return 0;
 }
 
 int open_redirections(t_data *data)
@@ -57,7 +61,9 @@ int open_redirections(t_data *data)
             redir->fd = open(redir->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
             if (redir->fd == -1)
             {
-                ft_putstr_fd("bash: test: Permission denied\n", 2);
+                ft_putstr_fd("minishell: ", 2);
+                ft_putstr_fd(redir->filename, 2);
+                perror(" ");
                 return -1;
             }
             redir = redir->next;

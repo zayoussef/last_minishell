@@ -14,25 +14,29 @@
 
 void build_pwd(t_data *data)
 {
-    char    pwd[PATH_MAX];
-    char    *oldpwd;
+    char pwd[PATH_MAX];
+    char *oldpwd;
+    int fd;
 
+    fd = handle_redirection_and_errors(data);
+    if (fd == -1)
+        return ;
     if (getcwd(pwd, PATH_MAX))
     {
-        printf("%s\n", pwd);
+        ft_putendl_fd(pwd, fd);
         data->exit_status = EXIT_SUCCESS;
     }
-    else
+    else 
     {
         oldpwd = ft_getenv(data->env_list, "PWD");
         if (oldpwd)
         {
-            printf("%s\n", oldpwd);
+            ft_putendl_fd(oldpwd, fd);
             data->exit_status = EXIT_SUCCESS;
         }
-        else
+        else 
         {
-            printf("minishell: pwd: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory\n");
+            ft_putendl_fd("minishell: pwd: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory", fd);
             data->exit_status = EXIT_FAILURE;
         }
     }

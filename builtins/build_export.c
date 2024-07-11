@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 18:37:48 by yozainan          #+#    #+#             */
-/*   Updated: 2024/06/28 23:19:42 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/11 18:12:27 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void sort_env(t_env_node *tmp_env)
     }
 }
 
-void print_sorted_env(t_env_node *env)
+void print_sorted_env_fd(t_env_node *env, int fd)
 {
     t_env_node *tmp_env;
 
@@ -42,10 +42,15 @@ void print_sorted_env(t_env_node *env)
     {
         if (ft_strcmp(tmp_env->name, "_") != 0) // Skip printing the "_" variable
         {
-            printf("declare -x %s", tmp_env->name);
+            ft_putstr_fd("declare -x ", fd);
+            ft_putstr_fd(tmp_env->name, fd);
             if (tmp_env->value)
-                printf("=\"%s\"", tmp_env->value);
-            printf("\n");
+            {
+                ft_putstr_fd("=\"", fd);
+                ft_putstr_fd(tmp_env->value, fd);
+                ft_putstr_fd("\"", fd);
+            }
+            ft_putstr_fd("\n", fd);
         }
         tmp_env = tmp_env->next;
     }
@@ -94,18 +99,25 @@ void handle_export(t_env_node **env_list, char *arg)
 void build_export(t_data *data)
 {
     int i = 1;
+    int fd;
 
+    fd = handle_redirection_and_errors(data);
+    if (fd == -1)
+        return ;
     if (data->ac == 1)
     {
-        print_sorted_env(data->env_list);
+        print_sorted_env_fd(data->env_list, fd);
         return ;
     }
     while (data->av[i])
     {
         if (!is_valid_identifier(data->av[i]))
         {
-            printf("minishell: export: `%s`: not a valid identifier\n", data->av[i]);
+            ft_putstr_fd("minishell: export: `", fd);
+            ft_putstr_fd(data->av[i], fd);
+            ft_putstr_fd("`: not a valid identifier\n", fd);
             data->exit_status = EXIT_FAILURE;
+            return ;
         }
         else
             handle_export(&(data->env_list), data->av[i]);

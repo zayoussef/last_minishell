@@ -137,35 +137,45 @@ void handle_v2(const char **p,char *special,TokenType *type);
 void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens, QuoteWordParserState *state) ;
 int check_syntaxe(Token *tokens,int nb_tokens);
 int ft_size(char **argv);
+
 /**********************redirection_parisng***********************/
 void add_token(Token *tokens, int *num_tokens, TokenType type, char *value) ;
 void skip_whitespace(const char **p) ;
 void handle_redirection(Token *tokens, int *i, Command **current) ;
 void finalize_command(Command **current, int *argc) ;
+
 /********************************free_parsing************************************/
 void free_all_resources(Command *head);
 void free_redirection(Redirection *redir) ;
 void free_all_v2(Command *current);
+
 /*****************************REIRECTION_OPEN_FILE*****************************************/
 int open_redirections(t_data *data);
 int redirection_in_out(t_data *data) ;
+
 /********************parsing_tools********************/
 void ft_strncpy(char *dest, const char *src, int n);
+
 /*****************builtins_utils*****************/
 void        append_to_existing_env(t_env_node *current, char *name, char *value);
 void        update_or_add_env(t_env_node **env_list, char *name, char *value);
 void        existing_env(t_env_node **env_list, char *name, char *value);
 void        update_env_var(t_env_node **env_list, char *name, char *new);
+void ft_init_minishell(int ac, char **av, char **env, t_data *data);
+char *find_command_path(const char *command, t_env_node *env_list);
 char        *get_env_value(t_env_node *env, const char *name);
 void        change_directory(t_data *data, const char *path);
 void        handle_new_env(t_env_node **env_list, char *arg);
 void        handle_export(t_env_node **env_list, char *arg);
 char        *ft_getenv(t_env_node *env, const char *name);
 t_env_node  *find_env(t_env_node *env, const char *name);
+int         handle_redirection_and_errors(t_data *data);
 void        print_oldpwd_and_pwd(t_env_node *env_list);
 void        ft_swap_env(t_env_node *a, t_env_node *b);
+void        free_env_list(t_env_node *env_list);
 void        print_sorted_env(t_env_node *env);
 int         validation_home(t_env_node *env);
+t_env_node  *create_env_list(char **s_env);
 void        sort_env(t_env_node *tmp_env);
 void        swap_pwd_oldpwd(t_data *data);
 int         is_valid_identifier(char *s);
@@ -176,17 +186,14 @@ void        check_option(char **av);
 void        go_home(t_data *data);
 int         check_number(char *s);
 int         check_n(char *str);
-void ft_init_minishell(int ac, char **av, char **env, t_data *data);
-char *find_command_path(const char *command, t_env_node *env_list);
-void free_env_list(t_env_node *env_list);
-t_env_node *create_env_list(char **s_env);
+
 /***********************builtin*******************/
 void    build_export(t_data *data);
 void    build_unset(t_data *data);
+void    build_echo(t_data *data);
 void    build_env(t_data *data);
 void    build_pwd(t_data *data);
 void    build_cd(t_data *data);
-void    build_echo(char **av);
 void    build_exit(char **av);
 
 #endif

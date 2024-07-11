@@ -218,8 +218,8 @@ int execute_builtin(Command *cmd, t_data *data, int *flag)
     else if (!ft_strcmp(cmd->argv[0], "unset"))
         build_unset(data);
     else if (!ft_strcmp(cmd->argv[0], "echo"))
-        build_echo(cmd->argv);
-    return (0);
+        build_echo(data);
+    return (data->exit_status);
 }
 
 void run_builtin(Command *cmd, t_data *data, int *status)
@@ -227,6 +227,11 @@ void run_builtin(Command *cmd, t_data *data, int *status)
     if (data->size_cmds == 1 && check_is_builtin(*data) == 1)
     {
         output_fd(data);
+        if (data->cmd->output)
+        {
+            redirection_in_out(data);
+            
+        }
         dup2(data->fdout, STDOUT_FILENO);
         close(data->fdout);
         if (!data->pipe_errors)
@@ -568,7 +573,21 @@ t_data *get_global_data(void)
     g_data.exit_status = 0;
     return &g_data;
 }
+int handle_redirection_and_errors(t_data *data)
+{
+    int fd;
 
+    fd = STDOUT_FILENO;
+    if (data->cmd->output != NULL) 
+        fd = data->cmd->output->fd;
+    else if (data->cmd->input != NULL)
+    {
+        ft_putstr_fd("minishell: file: No such file or directory\n", STDERR_FILENO);
+        data->exit_status = 1;
+        return (-1);
+    }
+    return fd;
+}
 
 
 int main(int argc, char **argv, char **envp)
@@ -580,12 +599,6 @@ int main(int argc, char **argv, char **envp)
     int     nb_token;
     int     exit_status;
 
-    // data = malloc(sizeof(t_data *));
-    // if (!data)
-    // {
-    //     perror("malloc");
-    //     return EXIT_FAILURE;
-    // }
     (void)argc;
     (void)argv;
     data = get_global_data();
@@ -608,24 +621,27 @@ int main(int argc, char **argv, char **envp)
             continue ;
         }
         cmd = parse(tokens);
-        data->cmd = cmd;
-        data->ac = ft_size(cmd->argv);
-        data->av = cmd->argv;
-        if (!data->cmd)
+        if (cmd)
         {
+            data->cmd = cmd;
+            data->ac = ft_size(cmd->argv);
+            data->av = cmd->argv;
+            // if (!data->cmd)
+            // {
+            //     free(line); // propaly wiht new stuctur line have leaks 
+            //     continue ;
+            // }
+            open_redirections(data);
+            while (data->cmd && data->cmd->argv[0] == NULL)
+                data->cmd = data->cmd->next;
+            if (data->cmd)
+                execution(data->cmd, data);
             free(line);
-            continue ;
+            free_all_resources(cmd);
         }
-        open_redirections(data);
-        while (data->cmd && data->cmd->argv[0] == NULL)
-            data->cmd = data->cmd->next;
-        if (data->cmd)
-            execution(data->cmd, data);
-        free(line);
-        free_all_resources(cmd);
+        exit_status = data->exit_status;
+        // free_env_list(data->env_list);
+        // free(data);
     }
-    exit_status = data->exit_status;
-    free_env_list(data->env_list);
-    // free(data);
     return (exit_status);
 }
