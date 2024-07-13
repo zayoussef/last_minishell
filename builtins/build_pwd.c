@@ -18,7 +18,7 @@ void build_pwd(t_data *data)
     char *oldpwd;
     int fd;
 
-    fd = handle_redirection_and_errors(data);
+    fd = data->cmd->fdout;
     if (fd == -1)
         return ;
     if (getcwd(pwd, PATH_MAX))

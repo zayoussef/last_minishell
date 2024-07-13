@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/11 18:17:12 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/13 17:29:08 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void build_env(t_data *data)
     t_env_node  *curr;
     int         fd;
 
-    fd = handle_redirection_and_errors(data);
+    fd = data->cmd->fdout;
     if (fd == -1)
         return ;
     curr = data->env_list;

@@ -2,16 +2,17 @@ NAME = minishell
 
 #NAME_BONUS = pipex_bonus
 
-CFLAGS = -Wall -Wextra -Werror  #-g3 -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror #-g3 -fsanitize=address #-Wall -Wextra -Werror
 LDFLAGS = -lreadline
 
 CC = cc 
 
-SRC = minishell.c config_mini.c  libft/ft_atoll.c libft/ft_putchar_fd.c libft/ft_putendl_fd.c libft/ft_putstr_fd.c libft/ft_split.c libft/ft_strchr.c \
+SRC = minishell.c libft/ft_atoll.c libft/ft_putchar_fd.c libft/ft_putendl_fd.c libft/ft_putstr_fd.c libft/ft_split.c libft/ft_strchr.c \
         libft/ft_strcmp.c libft/ft_strjoin.c libft/ft_strjoinc.c libft/ft_strlen.c libft/ft_itoa.c libft/ft_strncmp.c libft/ft_strnstr.c libft/ft_memset.c \
         builtins/build_cd.c builtins/build_echo.c builtins/build_exit.c builtins/build_export.c builtins/build_pwd.c \
         builtins/build_unset.c builtins/builtins_cd_utils.c builtins/bulild_env.c libft/ft_strdup.c builtins/builtins_export_utils.c \
-		free_parsing.c init_parsing.c lexer.c open_file.c parsing.c parsing_tools.c redirection.c
+        parsing/free_parsing.c parsing/init_parsing.c parsing/lexer.c  parsing/parsing.c parsing/parsing_tools.c exection/redirection.c \
+        exection/open_file.c parsing/config_mini.c
 
 
 #SRC_BONUS = pipex_bonus.c utils_bonus.c libft/ft_strlen.c libft/ft_strncmp.c libft/ft_strnstr.c libft/ft_strjoin.c \

@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/11 16:36:34 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/13 17:00:21 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void build_echo(t_data *data)
 
     i = 1;
     newline = 1;
-    fd = handle_redirection_and_errors(data);
+    fd = data->cmd->fdout;
     if (fd == -1)
         return ;
     if (data->cmd->argv[i] && ft_strcmp(data->cmd->argv[i], "-n") == 0)

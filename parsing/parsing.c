@@ -6,11 +6,11 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 21:36:21 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/11 14:26:46 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/13 14:10:23 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int check_ambiguous_unexpected_tokens(Token *tokens,int i)
 {

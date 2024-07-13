@@ -1,5 +1,4 @@
-#include "minishell.h"
-#include <unistd.h> // For getpid()
+#include "../minishell.h"
 
 void handle_quotes_and_wordsv2(const char **p,QuoteWordParserState **state)
 {

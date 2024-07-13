@@ -6,11 +6,11 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 17:31:07 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/08 16:46:59 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/13 14:45:30 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void add_env_list(t_env_node **env_list, t_env_node *new_node)
 {

@@ -26,6 +26,7 @@
 #include <readline/history.h>
 #include "libft/libft.h"
 
+#define PATH_ENV "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 typedef struct s_env_node
 {
@@ -67,18 +68,19 @@ typedef struct Redirection
     TokenType type;
     char *filename;
     int pipe_erros;
-    int fd;
     struct Redirection *next;
 } Redirection;
 
 typedef struct Command 
 {
     TokenType *type;
-    char **argv;                // Arguments array
     Redirection *input;         // Input redirection
     Redirection *output;        // Output redirection
     Redirection *append_output; // Append output redirection
     Redirection *heredoc;       // Here-doc redirection
+    char        **argv;         // Arguments array
+    int         fdin;           //
+    int         fdout;          //
     struct Command *next;       // Pointer to next command
 } Command;
 
@@ -93,17 +95,18 @@ typedef struct s_data
     int         i;
     int         flag;
     int         ac;
-    int		    in_file;
-	int		    out_file;
+    // int		    in_file;
+	// int		    out_file;
     int         fd[2];
-    int         fdin;
-    int         fdout;
-	int			tmp_in;
-	int			tmp_out;
+    // int         fdin; //
+    // int         fdout; //
+	// int			tmp_in;
+	// int			tmp_out;
     int			size_cmds;
     int         pipe_errors;
     int         exit_status;
     int         exit_signal;
+    int         redir_erros;
 } t_data;
 
 extern t_data g_data;
@@ -150,8 +153,8 @@ void free_redirection(Redirection *redir) ;
 void free_all_v2(Command *current);
 
 /*****************************REIRECTION_OPEN_FILE*****************************************/
-int open_redirections(t_data *data);
-int redirection_in_out(t_data *data) ;
+void open_check_redirections(t_data *data);
+void redirection_in_out(t_data *data) ;
 
 /********************parsing_tools********************/
 void ft_strncpy(char *dest, const char *src, int n);
@@ -186,6 +189,7 @@ void        check_option(char **av);
 void        go_home(t_data *data);
 int         check_number(char *s);
 int         check_n(char *str);
+int         check_is_builtin(t_data data);
 
 /***********************builtin*******************/
 void    build_export(t_data *data);

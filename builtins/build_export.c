@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 18:37:48 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/11 18:12:27 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/13 17:28:59 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ void build_export(t_data *data)
     int i = 1;
     int fd;
 
-    fd = handle_redirection_and_errors(data);
+    fd = data->cmd->fdout;
     if (fd == -1)
         return ;
     if (data->ac == 1)
