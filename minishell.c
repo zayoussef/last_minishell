@@ -155,35 +155,6 @@ char **list_to_char(t_env_node *env_list)
     return env_array;
 }
 
-// void	check_file_cmd1(Command *cmd)
-// {
-// 	if (cmd->input->fd < 0)
-// 	{
-// 		if (access(cmd->argv[1], F_OK) == -1)
-// 		{
-// 			ft_putstr_fd("minishell: no such file or directory ", 2);
-// 			ft_putstr_fd(cmd->argv[1], 2);
-// 			ft_putstr_fd("\n", 2);
-// 			exit(EXIT_FAILURE);
-// 		}
-// 		else
-// 		{
-// 			ft_putstr_fd("minishell: ", 2);
-// 			ft_putstr_fd(cmd->argv[1], 2);
-// 			ft_putstr_fd(": ", 2);
-// 			ft_putstr_fd("permission denied", 2);
-// 			ft_putstr_fd("\n", 2);
-// 			exit(EXIT_FAILURE);
-// 		}
-// 	}
-// 	if (ft_strlen(cmd->argv[2]) == 0)
-// 	{
-// 		ft_putstr_fd("pipex: permission denied:\n", 2);
-// 		exit(126);
-// 	}
-// }
-
-
 int check_is_builtin(t_data data)
 {
     char    **builtins;
@@ -213,117 +184,230 @@ int check_is_builtin(t_data data)
     return (clear_tab(builtins), 0);
 }
 
-int execute_builtin(Command *cmd, t_data *data, int *flag)
+int execute_builtin(t_data *data)
 {
-    *flag = 1;
-    if (!ft_strcmp(cmd->argv[0], "exit"))
-        build_exit(cmd->argv);
-    else if (!ft_strcmp(cmd->argv[0], "env"))
+    if (!ft_strcmp(data->cmd->argv[0], "exit"))
+        build_exit(data->cmd->argv);
+    else if (!ft_strcmp(data->cmd->argv[0], "env"))
         build_env(data);
-    else if (!ft_strcmp(cmd->argv[0], "pwd"))
+    else if (!ft_strcmp(data->cmd->argv[0], "pwd"))
         build_pwd(data);
-    else if (!ft_strcmp(cmd->argv[0], "cd"))
+    else if (!ft_strcmp(data->cmd->argv[0], "cd"))
         build_cd(data);
-    else if (!ft_strcmp(cmd->argv[0], "export"))
+    else if (!ft_strcmp(data->cmd->argv[0], "export"))
         build_export(data);
-    else if (!ft_strcmp(cmd->argv[0], "unset"))
+    else if (!ft_strcmp(data->cmd->argv[0], "unset"))
         build_unset(data);
-    else if (!ft_strcmp(cmd->argv[0], "echo"))
+    else if (!ft_strcmp(data->cmd->argv[0], "echo"))
         build_echo(data);
     return (data->exit_status);
 }
 
-void run_builtin(Command *cmd, t_data *data, int *status)
+void run_builtin(t_data *data, int *status)
 {
-    if (data->cmd->next == NULL && check_is_builtin(*data) == 1)
+    if (check_is_builtin(*data) == 1)
     {
-        // output_fd(data);
-        // if (data->cmd->output)
-        // {
-        //     redirection_in_out(data);
-            
-        // 
-        *status = execute_builtin(cmd, data, &data->flag);
-        else
+        *status = execute_builtin(data);
+    }
+    else
+        *status = 1;
+    data->exit_status = *status;
+}
+
+void singel_cmd(t_data *data, int *status)
+{
+    //output in stdout;
+    if (check_is_builtin(*data) == 1)
+        run_builtin(data, status);
+    else
+    {
+        data->singel_pid = fork();
+        if (data->singel_pid  == -1)
         {
-            *status = 1;
-            data->flag = -1;
+            perror("fork");
+            return ;
         }
-        data->exit_status = *status;
-        data->i = 1;
+        else if (data->singel_pid == 0)
+        {
+            data->env = list_to_char(data->env_list);
+            run_execution(data);
+        }
+        else
+            wating_processes(data, status);
+    }
+}
+
+void first_cmd(t_data *data, int *status)
+{
+    int pipe_fd[2];
+
+    // Create a pipe for inter-process communication
+    if (pipe(pipe_fd) == -1)
+    {
+        perror("pipe");
+        *status = 1;
+        return;
     }
 
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        perror("fork");
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+        *status = 1;
+        return;
+    }
+    else if (pid == 0)
+    {
+        // Child process
+        // Redirect STDOUT to the write end of the pipe
+        if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
+        {
+            perror("dup2");
+            exit(EXIT_FAILURE);
+        }
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+
+        // Check if the command is a built-in command and execute it
+        if (check_is_builtin(*data) == 1)
+        {
+            execute_builtin(data);
+            exit(data->exit_status);  // Ensure to exit with the status set by the built-in command
+        }
+        else
+        {
+            // Execute the command if it's not a built-in
+            data->env = list_to_char(data->env_list);
+            run_execution(data);
+            exit(EXIT_FAILURE);  // run_execution should handle exit
+        }
+    }
+    else
+    {
+        // Parent process
+        // Close the write end of the pipe, parent does not use it
+        close(pipe_fd[1]);
+        // Store the read end of the pipe to pass it to the next command
+        data->fd[0] = pipe_fd[0];
+    }
 }
 
-void init_execution(Command *cmd, t_data *data, int *status)
+int middel_cmd(t_data *data, int *status)
 {
-    run_builtin(cmd, data, status);
-    // Set signal handlers
-    signal(SIGINT, SIG_IGN);
-    signal(SIGQUIT, SIG_IGN);
+    int pipe_fd[2];
+
+    if (pipe(pipe_fd) == -1)
+    {
+        perror("pipe");
+        *status = 1;
+        return -1;
+    }
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        perror("fork");
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+        *status = 1;
+        return -1;
+    }
+    else if (pid == 0)
+    {
+        // Child process
+        if (dup2(data->fd[0], STDIN_FILENO) == -1 || dup2(pipe_fd[1], STDOUT_FILENO) == -1)
+        {
+            perror("dup2");
+            exit(EXIT_FAILURE);
+        }
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+        close(data->fd[0]);
+
+        if (check_is_builtin(*data) == 1)
+        {
+            execute_builtin(data);
+            exit(data->exit_status);
+        }
+        else
+        {
+            data->env = list_to_char(data->env_list);
+            run_execution(data);
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        // Parent process
+        close(data->fd[0]);
+        close(pipe_fd[1]);
+        data->fd[0] = pipe_fd[0];
+    }
+    return 0;
 }
 
-// void output_fd(t_data *data)
-// {
-//     if (data->cmd->output && data->cmd->output->fd_out > 1)
-//         data->fdout = data->cmd->output->fd_out;
-//     else
-//         data->fdout = dup(data->tmp_out);
-// }
+int last_cmd(t_data *data, int *status)
+{
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        perror("fork");
+        *status = 1;
+        return -1;
+    }
+    else if (pid == 0)
+    {
+        // Child process
+        if (dup2(data->fd[0], STDIN_FILENO) == -1)
+        {
+            perror("dup2");
+            exit(EXIT_FAILURE);
+        }
+        close(data->fd[0]);
 
-// void open_pipe(t_data *data)
-// {
-//     if (pipe(data->fd) == -1)
-//     {
-//         perror("pipe");
-//         exit(EXIT_FAILURE);
-//     }
-//     if (data->out_file > 1)
-//     {
-//         data->fdout = data->out_file;
-//         data->out_file = data->fd[1];
-//         if (dup2(data->out_file, STDOUT_FILENO) == -1)
-//         {
-//             perror("dup2");
-//             exit(EXIT_FAILURE);
-//         }
-//         close_if_not_standard_fd(data->out_file, STDOUT_FILENO);
-//     }
-//     else
-//         data->fdout = data->fd[1];
-// }
+        if (check_is_builtin(*data) == 1)
+        {
+            execute_builtin(data);
+            exit(data->exit_status);
+        }
+        else
+        {
+            data->env = list_to_char(data->env_list);
+            run_execution(data);
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        // Parent process
+        close(data->fd[0]);
+    }
+    return 0;
+}
+
+void init_execution(t_data *data, int *status)
+{
+    if (data->size_cmds == 1)
+        singel_cmd(data, status);// done from where 1 command all test done !
+    else if (data->size_cmds > 1 )
+    {
+        first_cmd(data, status);
+        data->cmd = data->cmd->next;
+        while (data->cmd->next != NULL)
+        {
+            middel_cmd(data, status);
+            data->cmd = data->cmd->next;
+        }
+        last_cmd(data, status);
+    }
+}
 
 void close_if_not_standard_fd(int fd, int standard_fd)
 {
     if (fd != standard_fd)
         close(fd);
 }
-
-
-// void setup_pipe_redirection(t_data *data)
-// {
-//     if (data->fdin != data->in_file)
-//     {
-//         if (data->in_file > 0)
-//         {
-//             close_if_not_standard_fd(data->in_file, STDIN_FILENO);
-//             data->fdin = data->in_file;
-//         }
-//     }
-//     if (dup2(data->fdin, STDIN_FILENO) == -1)
-//     {
-//         perror("dup2");
-//         exit(EXIT_FAILURE);
-//     }
-//     close_if_not_standard_fd(data->fdin, STDIN_FILENO);
-//     data->fdin = data->fd[0];
-//     if (dup2(data->fdout, STDOUT_FILENO) == -1)
-//     {
-//         perror("dup2");
-//         exit(EXIT_FAILURE);
-//     }
-//     close_if_not_standard_fd(data->fdout, STDOUT_FILENO);
-// }
 
 void run_execution(t_data *data)
 {
@@ -361,22 +445,15 @@ void run_execution(t_data *data)
 
 void run_child(t_data *data, int *status)
 {
-    Command *cmd = data->cmd;
-
-    if (check_is_builtin(*data))
+    if (check_is_builtin(*data) == 1)
     {
-        *status = execute_builtin(cmd, data, &data->flag);
+        *status = execute_builtin(data);
         data->exit_status = *status;
         exit(data->exit_status);
     }
-    else if (data->flag != -1)
+    else if (data)
     {
-        // close_if_not_standard_fd(data->cmd->fdin, 0);
         data->env = list_to_char(data->env_list);
-        // if (cmd->input && cmd->input->fd_in != -1)
-        //     handle_redirection_and_errors(data);
-        // else if (cmd->output && cmd->output->fd_out != -1)
-        //     handle_redirection_and_errors(data);
         run_execution(data);
     }
 }
@@ -398,19 +475,12 @@ void execute_fork(t_data *data, int *status)
         // Child process
         signal(SIGINT, SIG_DFL);  // Reset SIGINT to default behavior
         signal(SIGQUIT, SIG_DFL); // Reset SIGQUIT to default behavior
-        dup2(data->cmd->fdin, STDIN_FILENO);
-        dup2(data->cmd->fdout, STDOUT_FILENO);
-        close_if_not_standard_fd(data->cmd->fdin, STDIN_FILENO);
-        close_if_not_standard_fd(data->cmd->fdout, STDOUT_FILENO);
-        // nedd check and close 
         while (tmp)
         {
             if (data->exit_signal == -1)
                 exit(130);
             tmp = tmp->next;
         }
-        // if (open_check_redirections(data) == -1 )
-        //     exit(1);
         run_child(data, status);
         data->exit_status = *status;
         exit(data->exit_status); // Ensure child process exits with the correct status
@@ -419,11 +489,10 @@ void execute_fork(t_data *data, int *status)
 
 void execute_cmd(Command *cmds, t_data *data, int *status)
 {
-    cmds = data->cmd; 
+    cmds = data->cmd;
     while (cmds)
     {
         execute_fork(data, status);
-        // data->i++;
         cmds = cmds->next;
     }
 }
@@ -456,14 +525,15 @@ void wating_processes(t_data *data, int *status)
     }
 }
 
-void execution(Command *cmd, t_data *data)
+void execution(t_data *data)
 {
     int status;
 
-    data->i = 0;
-    init_execution(cmd, data, &status);
-    execute_cmd(cmd, data, &status);
-    // restore_and_cleanup(data);
+    status  = 0;
+    open_check_redirections(data);
+    if (data->redir_erros == -1)
+        return ;
+    init_execution(data, &status);
     wating_processes(data, &status);
 }
 
@@ -480,8 +550,21 @@ void handle_sigint(int sig)
 t_data *get_global_data(void)
 {
     g_data.exit_status = 0;
+    g_data.exit_signal = 0;
     g_data.redir_erros = 0;
     return &g_data;
+}
+
+int ft_strlnode(Command *cmd)
+{
+    int i = 0;
+
+    while (cmd)
+    {
+        i++;
+        cmd = cmd->next;
+    }
+    return i;
 }
 
 int main(int argc, char **argv, char **envp)
@@ -501,7 +584,7 @@ int main(int argc, char **argv, char **envp)
     {
         signal(SIGINT, handle_sigint);
         signal(SIGQUIT, SIG_IGN);
-        line = readline("minishell> ");
+        line = readline("\033[32mminishell> \033[0m");
         if (!line)
             break;
         if (strlen(line) > 0)
@@ -520,11 +603,11 @@ int main(int argc, char **argv, char **envp)
             data->cmd = cmd;
             data->ac = ft_size(cmd->argv);
             data->av = cmd->argv;
+            data->size_cmds = ft_strlnode(data->cmd);
             data->redir_erros = 0;
             data->cmd->fdin = 0;
             data->cmd->fdout= 1;
-            open_check_redirections(data);
-            execution(data->cmd, data);
+            execution(data);
             free(line);
             free_all_resources(cmd);
         }

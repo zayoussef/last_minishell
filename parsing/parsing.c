@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 21:36:21 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/13 14:10:23 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/15 12:34:21 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,10 +103,12 @@ Command* parse(Token *tokens)
     flag = 0;
     argc = 0;
     i = 0;
-    while (tokens[i].type != TOKEN_END) {
+    while (tokens[i].type != TOKEN_END) 
+    {
         if (tokens[i].type == TOKEN_WORD) {
             handle_word(tokens, &i, &current, &argc);
-        } else if (tokens[i].type == TOKEN_PIPE || tokens[i].type == TOKEN_AND) {
+        } else if (tokens[i].type == TOKEN_PIPE || tokens[i].type == TOKEN_AND) 
+        {
             finalize_command(&current, &argc);
             add_command_to_list(&head, current);
             current = create_command(); // Start a new command

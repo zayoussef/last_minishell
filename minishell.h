@@ -70,7 +70,7 @@ typedef struct Redirection
     int pipe_erros;
     struct Redirection *next;
 } Redirection;
-
+ 
 typedef struct Command 
 {
     TokenType *type;
@@ -80,28 +80,23 @@ typedef struct Command
     Redirection *heredoc;       // Here-doc redirection
     char        **argv;         // Arguments array
     int         fdin;           //
-    int         fdout;          //
+    int         fdout;
     struct Command *next;       // Pointer to next command
 } Command;
 
 typedef struct s_data
 {
     t_env_node  *env_list;
-    pid_t	    pid;
-	pid_t	    pid_last;
+    pid_t	    singel_pid;
+	pid_t	    first_pid;
+    pid_t       middel_pid;
+	pid_t	    last_pid;
+    pid_t pid;
     Command     *cmd;
     char        **av;
     char        **env;
-    int         i;
-    int         flag;
     int         ac;
-    // int		    in_file;
-	// int		    out_file;
     int         fd[2];
-    // int         fdin; //
-    // int         fdout; //
-	// int			tmp_in;
-	// int			tmp_out;
     int			size_cmds;
     int         pipe_errors;
     int         exit_status;
@@ -190,6 +185,8 @@ void        go_home(t_data *data);
 int         check_number(char *s);
 int         check_n(char *str);
 int         check_is_builtin(t_data data);
+void init_execution(t_data *data, int *status);
+void run_execution(t_data *data);
 
 /***********************builtin*******************/
 void    build_export(t_data *data);
