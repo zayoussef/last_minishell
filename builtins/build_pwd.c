@@ -14,9 +14,9 @@
 
 void build_pwd(t_data *data)
 {
-    char pwd[PATH_MAX];
-    char *oldpwd;
-    int fd;
+    char    pwd[PATH_MAX];
+    char    *oldpwd;
+    int     fd;
 
     fd = data->cmd->fdout;
     if (fd == -1)

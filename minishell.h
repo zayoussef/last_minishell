@@ -67,7 +67,6 @@ typedef struct Redirection
 {
     TokenType type;
     char *filename;
-    int pipe_erros;
     struct Redirection *next;
 } Redirection;
  
@@ -98,7 +97,6 @@ typedef struct s_data
     int         ac;
     int         fd[2];
     int			size_cmds;
-    int         pipe_errors;
     int         exit_status;
     int         exit_signal;
     int         redir_erros;
@@ -115,13 +113,7 @@ typedef struct
     t_env_node *env;
 } QuoteWordParserState;
 
-void input_redirection(t_data *data);
-void output_redirection(t_data *data);
-void open_pipe(t_data *data);
-void setup_redirections(t_data *data);
-void wating_processes(t_data *data, int *status);
-void output_fd(t_data *data);
-void close_if_not_standard_fd(int fd, int standard_fd);
+
 void handle_word(Token *tokens, int *i, Command **current, int *argc) ;
 void add_command_to_list(Command **head, Command *current) ;
 Command* create_command() ;
@@ -187,6 +179,28 @@ int         check_n(char *str);
 int         check_is_builtin(t_data data);
 void init_execution(t_data *data, int *status);
 void run_execution(t_data *data);
+void singel_cmd(t_data *data, int *status);
+void first_cmd(t_data *data, int *status);
+int middel_cmd(t_data *data, int *status);
+int last_cmd(t_data *data, int *status);
+void handle_sigint(int sig);
+t_data *get_global_data(void);
+int ft_strlnode(Command *cmd);
+void wating_processes(t_data *data, int *status);
+void init_execution(t_data *data, int *status);
+void execution(t_data *data);
+char	*build_executable_path(char *path, char *cmd);
+char	*check_cmd(char *cmd);
+void	clear_tab(char **tab);
+char    *find_path(char *cmd, char **env);
+char **list_to_char(t_env_node *env_list);
+void run_execution(t_data *data);
+int check_is_builtin(t_data data);
+int execute_builtin(t_data *data);
+void run_builtin(t_data *data, int *status);
+void run_builtin(t_data *data, int *status);
+
+
 
 /***********************builtin*******************/
 void    build_export(t_data *data);

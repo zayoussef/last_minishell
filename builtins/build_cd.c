@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 15:03:14 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/06 16:54:32 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/16 09:56:51 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,12 @@ void    go_home(t_data *data)
     char    *path;
     int     i;
 
+    dprintf(2, "hello \n");
     if (!validation_home(data->env_list))
     {
         ft_putstr_fd("minishell: cd : HOME not set\n",  2);
         data->exit_status = EXIT_FAILURE;
+        dprintf(2, "hello 1\n");
     }
     else
     {
@@ -42,6 +44,7 @@ void    go_home(t_data *data)
             return ;
         else
         {
+            dprintf(2, "hello 2\n");
             set_oldpwd(data->env_list);
             path = ft_getenv(data->env_list, "HOME");
             i = chdir(path);

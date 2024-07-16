@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/07/15 13:12:18 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/16 10:28:27 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,16 +77,3 @@ void open_check_redirections(t_data *data)
     }
 }
 
-// int handle_redirection_and_errors(t_data *data)
-// {
-//     int fd;
-
-//     fd = STDOUT_FILENO;
-//     if (data->cmd->input && (fd = data->cmd->input->fd_in) == -1)
-//         data->redir_erros = -1;
-//     if (data->cmd->output && (fd = data->cmd->output->fd_out) == -1)
-//         data->redir_erros = -1;
-//     if (data->cmd->append_output && (fd = data->cmd->append_output->fd_out) == -1)
-//         data->redir_erros = -1;
-//     return fd;
-// }

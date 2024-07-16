@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 15:03:14 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/09 09:13:47 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/16 10:10:09 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,12 @@ void set_pwd(t_env_node *env_list)
 
 void set_oldpwd(t_env_node *env_list)
 {
-    t_env_node *env;
+    t_env_node  *env;
     char        cwd[PATH_MAX];
 
     env = env_list;
     if (!getcwd(cwd, PATH_MAX))
     {
-        perror("getcwd");
         g_data.exit_status = EXIT_FAILURE;
         return ;
     }
