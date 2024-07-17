@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/16 14:56:16 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/17 18:17:11 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,14 @@ void singel_cmd(t_data *data, int *status)
             return ;
         }
         else if (data->singel_pid == 0)
+        {
+            if (data->cmd->fdout != STDOUT_FILENO)
+            {
+                dup2(data->cmd->fdout, STDOUT_FILENO);
+                close(data->cmd->fdout);
+            }
             run_execution(data);
+        }
         else
             wating_processes(data, status);
     }
@@ -57,6 +64,11 @@ void first_cmd(t_data *data, int *status)
     {
         // Child process
         // Redirect STDOUT to the write end of the pipe
+        if(data->cmd->fdout > 2)
+        {
+            close (pipe_fd[1]);
+            pipe_fd[1] = data->cmd->fdout;
+        }
         if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
         {
             perror("dup2");
@@ -107,6 +119,19 @@ int middel_cmd(t_data *data, int *status)
     else if (pid == 0)
     {
         // Child process
+
+        if(data->cmd->fdin > 2)
+        {
+            close (data->fd[0]);
+            data->fd[0] = data->cmd->fdin;
+        }
+        if(data->cmd->fdout > 2)
+        {
+            close (pipe_fd[1]);
+            pipe_fd[1] = data->cmd->fdout;
+        }
+        dprintf(2, "[\tin :%d\t]\n", data->cmd->fdin);
+        dprintf(2, "[\tout :%d\t]\n", data->cmd->fdout);   
         if (dup2(data->fd[0], STDIN_FILENO) == -1 || dup2(pipe_fd[1], STDOUT_FILENO) == -1)
         {
             perror("dup2");
@@ -122,13 +147,16 @@ int middel_cmd(t_data *data, int *status)
             exit(data->exit_status);
         }
         else
+        {
             run_execution(data);
+        }
     }
     else
     {
         // Parent process
         close(data->fd[0]);
         close(pipe_fd[1]);
+        data->cmd->fdout = pipe_fd[0];
         data->fd[0] = pipe_fd[0];
     }
     return 0;
@@ -146,13 +174,17 @@ int last_cmd(t_data *data, int *status)
     else if (pid == 0)
     {
         // Child process
+        if(data->cmd->fdin > 2)
+        {
+            close (data->fd[0]);
+            data->fd[0] = data->cmd->fdin;
+        }
         if (dup2(data->fd[0], STDIN_FILENO) == -1)
         {
             perror("dup2");
             exit(EXIT_FAILURE);
         }
         close(data->fd[0]);
-
         if (check_is_builtin(*data) == 1)
         {
             execute_builtin(data);
