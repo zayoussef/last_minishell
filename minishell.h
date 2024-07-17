@@ -68,18 +68,21 @@ typedef struct Redirection
     TokenType type;
     char *filename;
     struct Redirection *next;
-} Redirection;
- 
+} Redirection; // fiblaste matkoune stuct deyal kola type fi redirectio n
+// khase ukoune pointer wahed, buche utejem3o ou yethato binefse tartipe li aselane dakhel fi line men terminal !
+// khadek tsepisifi liya newe3e deyal redirection wache < wela > || >> || << 
+//> /fffff <kjdf
+
 typedef struct Command 
 {
-    TokenType *type;
+    TokenType   *type;
     Redirection *input;         // Input redirection
     Redirection *output;        // Output redirection
     Redirection *append_output; // Append output redirection
     Redirection *heredoc;       // Here-doc redirection
     char        **argv;         // Arguments array
     int         fdin;           //
-    int         fdout;
+    int         fdout;          //
     struct Command *next;       // Pointer to next command
 } Command;
 
@@ -141,7 +144,7 @@ void free_all_v2(Command *current);
 
 /*****************************REIRECTION_OPEN_FILE*****************************************/
 void open_check_redirections(t_data *data);
-void redirection_in_out(t_data *data) ;
+void redirection_in_out(t_data *data, Command *cmd);
 
 /********************parsing_tools********************/
 void ft_strncpy(char *dest, const char *src, int n);
