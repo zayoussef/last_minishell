@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/16 15:24:54 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/17 11:25:15 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void init_execution(t_data *data, int *status)
 {
     if (data->size_cmds == 1)
         singel_cmd(data, status); // done from where 1 command all test done !
-    else if (data->size_cmds > 1 )
+    else
     {
         first_cmd(data, status);
         data->cmd = data->cmd->next;
