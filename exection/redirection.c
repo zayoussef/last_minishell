@@ -15,25 +15,31 @@ void skip_whitespace(const char **p)
 
 void next_type(Redirection **redir,Command **current)
 {
-    if ((*redir)->type == TOKEN_REDIRECT_IN) 
+    Redirection *temp;
+    if ((*redir)->type == TOKEN_REDIRECT_IN || (*redir)->type == TOKEN_APPEND_OUT
+    || (*redir)->type == TOKEN_REDIRECT_OUT) 
     {
-        (*redir)->next = (*current)->input;
-        (*current)->input = (*redir);
+        if((*current)->redirection == NULL)
+            (*current)->redirection = (*redir);
+        else
+        {
+            temp = (*current)->redirection;
+            while(temp->next)
+                temp = temp->next;
+            temp->next = (*redir);
+        }
     }
-    else if ((*redir)->type == TOKEN_REDIRECT_OUT)
-    {
-        (*redir)->next = (*current)->output;
-        (*current)->output = (*redir);
-    } 
-    else if ((*redir)->type == TOKEN_APPEND_OUT) 
-    {
-        (*redir)->next = (*current)->append_output;
-        (*current)->append_output = (*redir);
-    } 
     else if ((*redir)->type == TOKEN_HERE_DOC) 
     {
-        (*redir)->next = (*current)->heredoc;
-        (*current)->heredoc = (*redir);
+         if((*current)->heredoc == NULL)
+            (*current)->heredoc = (*redir);
+        else
+        {
+            temp = (*current)->heredoc;
+            while(temp->next)
+                temp = temp->next;
+            temp->next = (*redir);
+        }
     }
 }
 

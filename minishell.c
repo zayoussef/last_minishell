@@ -35,7 +35,6 @@ int main(int argc, char **argv, char **envp)
     t_data  *data;
     char    *line;
     int     nb_token;
-    // int     exit_status;
 
     (void)argc;
     (void)argv;
@@ -54,7 +53,6 @@ int main(int argc, char **argv, char **envp)
         lex(line, tokens, &nb_token,data->env_list);
         if (check_syntaxe(tokens, nb_token))
         {
-            // printf("Syntax error\n");
             free(line);
             continue ;
         }
@@ -65,9 +63,6 @@ int main(int argc, char **argv, char **envp)
             data->ac = ft_size(cmd->argv);
             data->av = cmd->argv;
             data->size_cmds = ft_strlnode(data->cmd);
-            data->redir_erros = 0;
-            data->cmd->fdin = 0;
-            data->cmd->fdout= 1;
             execution(data);
             free(line);
             free_all_resources(cmd);

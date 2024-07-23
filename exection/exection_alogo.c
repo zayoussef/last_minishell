@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/17 18:17:11 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/23 22:32:10 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,12 @@
 
 void singel_cmd(t_data *data, int *status)
 {
-    //output in stdout;
     if (check_is_builtin(*data) == 1)
         run_builtin(data, status);
     else
     {
         data->singel_pid = fork();
-        if (data->singel_pid  == -1)
+        if (data->singel_pid == -1)
         {
             perror("fork");
             return ;
@@ -29,7 +28,11 @@ void singel_cmd(t_data *data, int *status)
         {
             if (data->cmd->fdout != STDOUT_FILENO)
             {
-                dup2(data->cmd->fdout, STDOUT_FILENO);
+                if (dup2(data->cmd->fdout, STDOUT_FILENO) == -1)
+                {
+                    perror("dup2");
+                    exit(EXIT_FAILURE);
+                }
                 close(data->cmd->fdout);
             }
             run_execution(data);
@@ -39,18 +42,17 @@ void singel_cmd(t_data *data, int *status)
     }
 }
 
-void first_cmd(t_data *data, int *status)
+void first_cmd(t_data **data, int *status)
 {
     int pipe_fd[2];
 
-    // Create a pipe for inter-process communication
+ 
     if (pipe(pipe_fd) == -1)
     {
         perror("pipe");
         *status = 1;
         return;
     }
-
     pid_t pid = fork();
     if (pid == -1)
     {
@@ -58,46 +60,47 @@ void first_cmd(t_data *data, int *status)
         close(pipe_fd[0]);
         close(pipe_fd[1]);
         *status = 1;
-        return;
+        return ;
     }
     else if (pid == 0)
     {
-        // Child process
-        // Redirect STDOUT to the write end of the pipe
-        if(data->cmd->fdout > 2)
+        if ((*data)->cmd->fdout > 2)
         {
-            close (pipe_fd[1]);
-            pipe_fd[1] = data->cmd->fdout;
-        }
-        if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
-        {
-            perror("dup2");
-            exit(EXIT_FAILURE);
-        }
-        close(pipe_fd[0]);
-        close(pipe_fd[1]);
-
-        // Check if the command is a built-in command and execute it
-        if (check_is_builtin(*data) == 1)
-        {
-            execute_builtin(data);
-            exit(data->exit_status);  // Ensure to exit with the status set by the built-in command
+            if (dup2((*data)->cmd->fdout, STDOUT_FILENO) == -1)
+            {
+                perror("dup2 first_command fdout");
+                exit(EXIT_FAILURE);
+            }
+            close((*data)->cmd->fdout);
         }
         else
-            run_execution(data);
-            // Execute the command if it's not a built-in
+        {
+            if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
+            {
+                perror("dup2 first_command pipe_fd[1]");
+                exit(EXIT_FAILURE);
+            }
+            close(pipe_fd[1]);
+        }
+        close(pipe_fd[0]);
+        if (check_is_builtin(*(*data)) == 1)
+        {
+            execute_builtin((*data));
+            exit((*data)->exit_status);
+        }
+        else
+            run_execution(*data);
     }
     else
     {
-        // Parent process
-        // Close the write end of the pipe, parent does not use it
         close(pipe_fd[1]);
-        // Store the read end of the pipe to pass it to the next command
-        data->fd[0] = pipe_fd[0];
+        printf("Debug: first_cmd - pipe_fd[0] = %d\n", pipe_fd[0]);
+        (*data)->fd[0] = pipe_fd[0];
     }
+    printf("Debug: $$+++$redirection_in_out - fdin = %d\n", (*data)->cmd->fdin);
 }
 
-int middel_cmd(t_data *data, int *status)
+int middel_cmd(t_data **data, int *status)
 {
     int pipe_fd[2];
 
@@ -118,52 +121,66 @@ int middel_cmd(t_data *data, int *status)
     }
     else if (pid == 0)
     {
-        // Child process
-
-        if(data->cmd->fdin > 2)
+        if ((*data)->cmd->fdin > 2)
         {
-            close (data->fd[0]);
-            data->fd[0] = data->cmd->fdin;
-        }
-        if(data->cmd->fdout > 2)
-        {
-            close (pipe_fd[1]);
-            pipe_fd[1] = data->cmd->fdout;
-        }
-        dprintf(2, "[\tin :%d\t]\n", data->cmd->fdin);
-        dprintf(2, "[\tout :%d\t]\n", data->cmd->fdout);   
-        if (dup2(data->fd[0], STDIN_FILENO) == -1 || dup2(pipe_fd[1], STDOUT_FILENO) == -1)
-        {
-            perror("dup2");
-            exit(EXIT_FAILURE);
-        }
-        close(pipe_fd[0]);
-        close(pipe_fd[1]);
-        close(data->fd[0]);
-
-        if (check_is_builtin(*data) == 1)
-        {
-            execute_builtin(data);
-            exit(data->exit_status);
+            printf("Debug: middel_cmd - fdin = %d\n", (*data)->cmd->fdin);
+            if (dup2((*data)->cmd->fdin, STDIN_FILENO) == -1)
+            {
+                perror("dup2 middel_command fdin");
+                exit(EXIT_FAILURE);
+            }
+            close((*data)->cmd->fdin);
         }
         else
         {
-            run_execution(data);
+            if (dup2((*data)->fd[0], STDIN_FILENO) == -1)
+            {
+                perror("dup2 middel_command data->fd[0]");
+                exit(EXIT_FAILURE);
+            }
+            close((*data)->fd[0]);
         }
+        if ((*data)->cmd->fdout > 2)
+        {
+            if (dup2((*data)->cmd->fdout, STDOUT_FILENO) == -1)
+            {
+                perror("dup2 middel_command fdout");
+                exit(EXIT_FAILURE);
+            }
+            close(pipe_fd[1]);
+        }
+        else
+        {
+            if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
+            {
+                perror("dup2 middel_command pipe_fd[1]");
+                exit(EXIT_FAILURE);
+            }
+            close(pipe_fd[1]);
+        }
+        close(pipe_fd[0]);
+        if (check_is_builtin(*(*data)) == 1)
+        {
+            execute_builtin((*data));
+            exit((*data)->exit_status);
+        }
+        else
+            run_execution(*data);
     }
     else
     {
-        // Parent process
-        close(data->fd[0]);
+        close((*data)->fd[0]);
+        printf("Debug: middel_cmd - pipe_fd[0] = %d\n", pipe_fd[0]);
         close(pipe_fd[1]);
-        data->cmd->fdout = pipe_fd[0];
-        data->fd[0] = pipe_fd[0];
+        (*data)->fd[0] = pipe_fd[0];
     }
     return 0;
 }
 
-int last_cmd(t_data *data, int *status)
+int last_cmd(t_data **data, int *status)
 {
+    // Fork a new process
+    printf("Debug: ______> last - fdin = %d\n", (*data)->cmd->fdin);
     pid_t pid = fork();
     if (pid == -1)
     {
@@ -173,31 +190,45 @@ int last_cmd(t_data *data, int *status)
     }
     else if (pid == 0)
     {
-        // Child process
-        if(data->cmd->fdin > 2)
+        printf("Debug: last_cmd - fdin = %d\n", (*data)->cmd->fdin);
+        if ((*data)->cmd->fdin > 2)
         {
-            close (data->fd[0]);
-            data->fd[0] = data->cmd->fdin;
-        }
-        if (dup2(data->fd[0], STDIN_FILENO) == -1)
-        {
-            perror("dup2");
-            exit(EXIT_FAILURE);
-        }
-        close(data->fd[0]);
-        if (check_is_builtin(*data) == 1)
-        {
-            execute_builtin(data);
-            exit(data->exit_status);
+            if (dup2((*data)->cmd->fdin, STDIN_FILENO) == -1)
+            {
+                perror("dup2 last_cmd fdin");
+                exit(EXIT_FAILURE);
+            }
+            // Close fdin after duplication
+            close((*data)->cmd->fdin);
         }
         else
-            run_execution(data);
+        {
+            printf("Debug: last_cmd - fd[0] = %d\n", (*data)->fd[0]);
+
+            // Redirect stdin to the read end of the previous pipe
+            if (dup2((*data)->fd[0], STDIN_FILENO) == -1)
+            {
+                perror("dup2 last_cmd data->fd[0]");
+                exit(EXIT_FAILURE);
+            }
+            // Close the read end of the previous pipe
+            close((*data)->fd[0]);
+        }
+
+        // Execute the command
+        if (check_is_builtin(*(*data)) == 1)
+        {
+            execute_builtin((*data));
+            exit((*data)->exit_status);
+        }
+        else
+            run_execution((*data));
     }
     else
     {
         // Parent process
-        close(data->fd[0]);
+        // Close the read end of the previous pipe
+        close((*data)->fd[0]);
     }
     return 0;
 }
-

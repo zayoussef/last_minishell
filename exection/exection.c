@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/17 11:25:15 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/23 22:37:57 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,14 +69,15 @@ void init_execution(t_data *data, int *status)
         singel_cmd(data, status); // done from where 1 command all test done !
     else
     {
-        first_cmd(data, status);
+        first_cmd(&data, status);
         data->cmd = data->cmd->next;
         while (data->cmd->next != NULL)
         {
-            middel_cmd(data, status);
+            middel_cmd(&data, status);
             data->cmd = data->cmd->next;
         }
-        last_cmd(data, status);
+    printf("Debug: >>>>>>>>> init_exe - fdin = %d\n", data->cmd->fdin);
+        last_cmd(&data, status);
     }
 }
 
@@ -85,7 +86,10 @@ void execution(t_data *data)
     int status;
 
     status  = 0;
-    open_check_redirections(data);
+    data->redir_erros = 0;
+    data->cmd->fdin = 0;
+    data->cmd->fdout= 1;
+    open_check_redirections(&data);
     if (data->redir_erros == -1)
         return ;
     init_execution(data, &status);

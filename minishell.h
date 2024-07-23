@@ -71,14 +71,15 @@ typedef struct Redirection
 } Redirection; // fiblaste matkoune stuct deyal kola type fi redirectio n
 // khase ukoune pointer wahed, buche utejem3o ou yethato binefse tartipe li aselane dakhel fi line men terminal !
 // khadek tsepisifi liya newe3e deyal redirection wache < wela > || >> || << 
-//> /fffff <kjdf
+// > /fffff <kjdf
 
+// output -> output ....etc // inp
 typedef struct Command 
 {
     TokenType   *type;
-    Redirection *input;         // Input redirection
-    Redirection *output;        // Output redirection
-    Redirection *append_output; // Append output redirection
+    //Redirection *input;         // Input redirection
+    Redirection *redirection;        // Output redirection
+   // Redirection *append_output; // Append output redirection
     Redirection *heredoc;       // Here-doc redirection
     char        **argv;         // Arguments array
     int         fdin;           //
@@ -143,8 +144,8 @@ void free_redirection(Redirection *redir) ;
 void free_all_v2(Command *current);
 
 /*****************************REIRECTION_OPEN_FILE*****************************************/
-void open_check_redirections(t_data *data);
-void redirection_in_out(t_data *data, Command *cmd);
+void redirection_in_out(t_data **data, Command *cmd);
+void open_check_redirections(t_data **data);
 
 /********************parsing_tools********************/
 void ft_strncpy(char *dest, const char *src, int n);
@@ -180,13 +181,13 @@ void        go_home(t_data *data);
 int         check_number(char *s);
 int         check_n(char *str);
 int         check_is_builtin(t_data data);
-void init_execution(t_data *data, int *status);
-void run_execution(t_data *data);
-void singel_cmd(t_data *data, int *status);
-void first_cmd(t_data *data, int *status);
-int middel_cmd(t_data *data, int *status);
-int last_cmd(t_data *data, int *status);
-void handle_sigint(int sig);
+void        init_execution(t_data *data, int *status);
+void        run_execution(t_data *data);
+void        singel_cmd(t_data *data, int *status);
+void        first_cmd(t_data **data, int *status);
+int         middel_cmd(t_data **data, int *status);
+int         last_cmd(t_data **data, int *status);
+void        handle_sigint(int sig);
 t_data *get_global_data(void);
 int ft_strlnode(Command *cmd);
 void wating_processes(t_data *data, int *status);

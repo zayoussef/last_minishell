@@ -3,9 +3,7 @@
 void init_command(Command *cmd) 
 {
     cmd->argv = (char **)malloc(MAX_TOKENS * sizeof(char *));
-    cmd->input = NULL;
-    cmd->output = NULL;
-    cmd->append_output = NULL;
+    cmd->redirection = NULL;
     cmd->heredoc = NULL;
     cmd->next = NULL;
 }
