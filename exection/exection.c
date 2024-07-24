@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/24 19:19:54 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/24 21:25:59 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,9 @@ int ft_strlnode(Command *cmd)
 
 void wating_processes(t_data *data, int *status)
 {
-    pid_t   pid;
-    int     wstatus;
-    int     i;
+    pid_t pid;
+    int wstatus;
+    int i;
 
     i = 0;
     waitpid(data->pid, status, 0);
@@ -89,14 +89,13 @@ void execution(t_data *data)
 {
     int status;
 
-    status  = 0;
+    status = 0;
     data->redir_erros = 0;
     data->cmd->fdin = 0;
     data->cmd->fdout = 1;
     open_check_redirections(&data);
     if (data->redir_erros == -1)
-        return ;
+        return;
     init_execution(data, &status);
     wating_processes(data, &status);
 }
-

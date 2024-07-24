@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/07/24 20:11:42 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/24 21:34:39 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void open_file(t_data **data, Command *cmd, TokenType type)
     fd = -1;
     if (type == TOKEN_REDIRECT_IN)
         fd = open(cmd->redirection->filename, O_RDONLY);
-    dprintf(2, "[\t%d]\n", fd);
     if (type == TOKEN_REDIRECT_OUT)
         fd = open(cmd->redirection->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (type == TOKEN_APPEND_OUT)
