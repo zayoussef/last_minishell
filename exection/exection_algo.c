@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exection_alogo.c                                   :+:      :+:    :+:   */
+/*   exection_algo.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/23 22:32:10 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/24 13:07:17 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ void first_cmd(t_data **data, int *status)
             }
             close(pipe_fd[1]);
         }
-        close(pipe_fd[0]);
+        close(pipe_fd[0]); //raed 
         if (check_is_builtin(*(*data)) == 1)
         {
             execute_builtin((*data));
@@ -94,10 +94,8 @@ void first_cmd(t_data **data, int *status)
     else
     {
         close(pipe_fd[1]);
-        printf("Debug: first_cmd - pipe_fd[0] = %d\n", pipe_fd[0]);
         (*data)->fd[0] = pipe_fd[0];
     }
-    printf("Debug: $$+++$redirection_in_out - fdin = %d\n", (*data)->cmd->fdin);
 }
 
 int middel_cmd(t_data **data, int *status)
@@ -123,7 +121,6 @@ int middel_cmd(t_data **data, int *status)
     {
         if ((*data)->cmd->fdin > 2)
         {
-            printf("Debug: middel_cmd - fdin = %d\n", (*data)->cmd->fdin);
             if (dup2((*data)->cmd->fdin, STDIN_FILENO) == -1)
             {
                 perror("dup2 middel_command fdin");
@@ -170,7 +167,6 @@ int middel_cmd(t_data **data, int *status)
     else
     {
         close((*data)->fd[0]);
-        printf("Debug: middel_cmd - pipe_fd[0] = %d\n", pipe_fd[0]);
         close(pipe_fd[1]);
         (*data)->fd[0] = pipe_fd[0];
     }
@@ -179,8 +175,6 @@ int middel_cmd(t_data **data, int *status)
 
 int last_cmd(t_data **data, int *status)
 {
-    // Fork a new process
-    printf("Debug: ______> last - fdin = %d\n", (*data)->cmd->fdin);
     pid_t pid = fork();
     if (pid == -1)
     {
@@ -190,7 +184,6 @@ int last_cmd(t_data **data, int *status)
     }
     else if (pid == 0)
     {
-        printf("Debug: last_cmd - fdin = %d\n", (*data)->cmd->fdin);
         if ((*data)->cmd->fdin > 2)
         {
             if (dup2((*data)->cmd->fdin, STDIN_FILENO) == -1)
@@ -198,24 +191,17 @@ int last_cmd(t_data **data, int *status)
                 perror("dup2 last_cmd fdin");
                 exit(EXIT_FAILURE);
             }
-            // Close fdin after duplication
             close((*data)->cmd->fdin);
         }
         else
         {
-            printf("Debug: last_cmd - fd[0] = %d\n", (*data)->fd[0]);
-
-            // Redirect stdin to the read end of the previous pipe
             if (dup2((*data)->fd[0], STDIN_FILENO) == -1)
             {
                 perror("dup2 last_cmd data->fd[0]");
                 exit(EXIT_FAILURE);
             }
-            // Close the read end of the previous pipe
             close((*data)->fd[0]);
         }
-
-        // Execute the command
         if (check_is_builtin(*(*data)) == 1)
         {
             execute_builtin((*data));
@@ -225,10 +211,6 @@ int last_cmd(t_data **data, int *status)
             run_execution((*data));
     }
     else
-    {
-        // Parent process
-        // Close the read end of the previous pipe
         close((*data)->fd[0]);
-    }
     return 0;
 }

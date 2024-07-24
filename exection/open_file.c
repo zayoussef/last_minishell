@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/07/23 22:20:39 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/24 12:59:12 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,9 @@ void open_check_redirections(t_data **data)
     current_cmd = (*data)->cmd;
     while (current_cmd != NULL)
     {
+        current_cmd->fdin = 0;
+        current_cmd->fdout = 1;
+        (*data)->redir_erros = 0;
         redirection_in_out(data, current_cmd);
         if ((*data)->redir_erros == -1)
             return ;

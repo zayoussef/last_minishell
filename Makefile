@@ -12,7 +12,7 @@ SRC = minishell.c libft/ft_atoll.c libft/ft_putchar_fd.c libft/ft_putendl_fd.c l
         builtins/build_cd.c builtins/build_echo.c builtins/build_exit.c builtins/build_export.c builtins/build_pwd.c \
         builtins/build_unset.c builtins/builtins_cd_utils.c builtins/bulild_env.c libft/ft_strdup.c builtins/builtins_export_utils.c \
         parsing/free_parsing.c parsing/init_parsing.c parsing/lexer.c  parsing/parsing.c parsing/parsing_tools.c exection/redirection.c \
-        exection/open_file.c parsing/config_mini.c exection/builtins_utils.c exection/exection_utils.c exection/exection.c exection/exection_alogo.c
+        exection/open_file.c parsing/config_mini.c exection/builtins_utils.c exection/exection_utils.c exection/exection.c exection/exection_algo.c
 
 
 #SRC_BONUS = pipex_bonus.c utils_bonus.c libft/ft_strlen.c libft/ft_strncmp.c libft/ft_strnstr.c libft/ft_strjoin.c \

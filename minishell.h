@@ -57,6 +57,7 @@ typedef enum
     TOKEN_END
 } TokenType;
 
+
 typedef struct 
 {
     TokenType type;
