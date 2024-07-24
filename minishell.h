@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 15:03:14 by yozainan         #+#    #+#             */
-/*   Updated: 2024/05/13 11:30:15 by yozainan        ###   ########.fr       */
+/*   Updated: 2024/07/24 13:57:50 by elchakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ typedef enum
 {
     TOKEN_WORD,
     TOKEN_PIPE,
+    TOKEN_OR,
     TOKEN_AMBIGUOUS,
     TOKEN_REDIRECT_IN,
     TOKEN_REDIRECT_OUT,
@@ -69,18 +70,12 @@ typedef struct Redirection
     TokenType type;
     char *filename;
     struct Redirection *next;
-} Redirection; // fiblaste matkoune stuct deyal kola type fi redirectio n
-// khase ukoune pointer wahed, buche utejem3o ou yethato binefse tartipe li aselane dakhel fi line men terminal !
-// khadek tsepisifi liya newe3e deyal redirection wache < wela > || >> || << 
-// > /fffff <kjdf
+} Redirection;
 
-// output -> output ....etc // inp
 typedef struct Command 
 {
     TokenType   *type;
-    //Redirection *input;         // Input redirection
-    Redirection *redirection;        // Output redirection
-   // Redirection *append_output; // Append output redirection
+    Redirection *redirection;   // Output redirection
     Redirection *heredoc;       // Here-doc redirection
     char        **argv;         // Arguments array
     int         fdin;           //
@@ -126,7 +121,7 @@ void init_command(Command *cmd) ;
 Command* parse(Token *tokens);
 
 /********************lex**************************/
-void lex(const char *input, Token *tokens, int *num_tokens,t_env_node *env);
+int lex(const char *input, Token *tokens, int *num_tokens,t_env_node *env);
 void handle_special_characters(const char **p, Token *tokens, int *num_tokens);
 void handle_v2(const char **p,char *special,TokenType *type);
 void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens, QuoteWordParserState *state) ;

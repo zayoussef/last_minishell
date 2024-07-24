@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/24 12:59:52 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/24 16:48:24 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,18 @@ int ft_strlnode(Command *cmd)
 
 void wating_processes(t_data *data, int *status)
 {
-    int i;
+    pid_t   pid;
+    int     wstatus;
+    int     i;
 
     i = 0;
-    if (waitpid(data->pid, status, 0) == -1)
-        return ;
+    waitpid(data->pid, status, 0);
     while (++i < data->size_cmds)
-        wait(NULL);
+    {
+        pid = wait(&wstatus);
+        if (pid == -1)
+            continue;
+    }
     if (WIFEXITED(*status))
         data->exit_status = WEXITSTATUS(*status);
     else if (WIFSIGNALED(*status))
@@ -59,7 +64,7 @@ void wating_processes(t_data *data, int *status)
             ft_putstr_fd("Quit (core dumped)\n", 2);
         else if (WTERMSIG(*status) == SIGINT)
             ft_putstr_fd("\n", 2);
-        data->exit_status = 128 + (*status);
+        data->exit_status = 128 + WTERMSIG(*status);
     }
 }
 

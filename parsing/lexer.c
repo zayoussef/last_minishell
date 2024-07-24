@@ -33,7 +33,7 @@ char* expand_variable(const char *start, int length, t_env_node *env)
 int is_ambiguous(const char *expanded_value) 
 {
     // Check if the expanded value contains spaces or is empty
-    return (strchr(expanded_value, ' ') != NULL || expanded_value[0] == '\0');
+    return (strchr(expanded_value, ' ') != NULL || expanded_value[0] == '\0' || !expanded_value);
 }
 
 void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens, QuoteWordParserState *state) 
@@ -75,7 +75,17 @@ void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens, Quo
                 free(pid_str);
                 (*p)++;
                 continue;
-            }           
+            }
+            else if(start[0] == '?')
+            {
+                expanded_value = ft_itoa(g_data.exit_status);
+                 while(expanded_value[i])
+                    state->buffer[state->buffer_index++] = expanded_value[i++];
+                free(expanded_value);
+                expanded_value = NULL;
+                g_data.exit_status = 0;
+                (*p)++;
+            }
             while (ft_isalnum(**p) || **p == '_') (*p)++;
             if (*p > start) {
                 expanded_value = expand_variable(start, *p - start,state->env);
@@ -87,7 +97,7 @@ void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens, Quo
                 }
                 else
                 {
-                while(expanded_value[i])
+                while(expanded_value[i] && start[0] != '?')
                 state->buffer[state->buffer_index++] = expanded_value[i++];
                 free(expanded_value);
                 }
@@ -105,13 +115,16 @@ void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens, Quo
         add_token(tokens, num_tokens, TOKEN_WORD, state->buffer);
 }
 
+
+
+
 void handle_v2(const char **p,char *special,TokenType *type)
 {
        if (**p == '>') 
         {
             if (*(*p + 1) == '>') 
             {
-                special[1] = '>';
+                special[0] = '>';
                 *type = TOKEN_APPEND_OUT;
                 (*p)++;
             }
@@ -124,14 +137,16 @@ void handle_v2(const char **p,char *special,TokenType *type)
             if (**p == '&' && *(*p + 1) != '&')
             {
                 *type = TOKEN_AND;
-                special[1] = '&';
-                (*p)++;
+                special[0] = '&';
+              //  (*p)++;
             }
             else
-            {
                 *type = TOKEN_BACKGROUND;
-                (*p)++;
-            }
+        }
+        else if(*(*p + 1) == '|')
+        {
+            *type = TOKEN_OR;
+            (*p)++;
         }
 }
 
@@ -139,7 +154,7 @@ void doc_or_in(const char **p,TokenType *type,char *special)
 {
             if (*(*p + 1) == '<') 
             {
-                special[1] = '<';
+                special[0] = '<';
                 *type = TOKEN_HERE_DOC;
                 (*p)++;
             } 
@@ -147,7 +162,7 @@ void doc_or_in(const char **p,TokenType *type,char *special)
                 *type = TOKEN_REDIRECT_IN;
 }
 
-void handle_special_characters(const char **p, Token *tokens, int *num_tokens)
+void handle_special_characters(const char **p, Token *tokens, int *num_tokens) 
 {
     TokenType type;
     char special[3];
@@ -158,7 +173,7 @@ void handle_special_characters(const char **p, Token *tokens, int *num_tokens)
         special[0] = **p;
         special[1] = '\0';
         type = TOKEN_WORD;
-        if (**p == '|') 
+        if (**p == '|' && *(*p + 1) != '|') 
             type = TOKEN_PIPE;
         else if (**p == '<')
            doc_or_in(p,&type,special);
@@ -166,24 +181,28 @@ void handle_special_characters(const char **p, Token *tokens, int *num_tokens)
             handle_v2(p,special,&type);
         add_token(tokens, num_tokens, type, special);
         (*p)++;
+        return ;
     }
     else if(**p == '(')
         {
-            type = TOKEN_LPR;
-            sp = " ( ";
+        type = TOKEN_LPR;
+        sp = " ( ";
         (*p)++;
         add_token(tokens, num_tokens, type, sp);
-    }
+        return ;
+        }
     else if(**p == ')')
         {
         type = TOKEN_RPR;
         sp = " ) ";
         (*p)++;
         add_token(tokens, num_tokens, type, sp);
-    }
+        return ;
+        }
 }
 
-void lex(const char *input, Token *tokens, int *num_tokens,t_env_node *env)
+
+int lex(const char *input, Token *tokens, int *num_tokens,t_env_node *env)
 {
     const char *p ;
     p = input;
@@ -202,9 +221,12 @@ void lex(const char *input, Token *tokens, int *num_tokens,t_env_node *env)
     }
 
     // Check if quotes are not closed
-    if (state.in_quotes) {
+    if (state.in_quotes) 
+    {
         printf("Syntax error: unclosed quote '%c'\n", state.quote_char);
+        return state.in_quotes;
     }
 
     add_token(tokens, num_tokens, TOKEN_END, "");
+    return 0;
 }

@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/24 13:07:17 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/24 16:23:59 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,13 @@ void singel_cmd(t_data *data, int *status)
         run_builtin(data, status);
     else
     {
-        data->singel_pid = fork();
-        if (data->singel_pid == -1)
+        data->pid = fork();
+        if (data->pid == -1)
         {
             perror("fork");
             return ;
         }
-        else if (data->singel_pid == 0)
+        else if (data->pid == 0)
         {
             if (data->cmd->fdout != STDOUT_FILENO)
             {
@@ -46,15 +46,14 @@ void first_cmd(t_data **data, int *status)
 {
     int pipe_fd[2];
 
- 
     if (pipe(pipe_fd) == -1)
     {
         perror("pipe");
         *status = 1;
         return;
     }
-    pid_t pid = fork();
-    if (pid == -1)
+    (*data)->pid = fork();
+    if ((*data)->pid == -1)
     {
         perror("fork");
         close(pipe_fd[0]);
@@ -62,7 +61,7 @@ void first_cmd(t_data **data, int *status)
         *status = 1;
         return ;
     }
-    else if (pid == 0)
+    else if ((*data)->pid == 0)
     {
         if ((*data)->cmd->fdout > 2)
         {
@@ -108,8 +107,8 @@ int middel_cmd(t_data **data, int *status)
         *status = 1;
         return -1;
     }
-    pid_t pid = fork();
-    if (pid == -1)
+    (*data)->pid = fork();
+    if ((*data)->pid == -1)
     {
         perror("fork");
         close(pipe_fd[0]);
@@ -117,7 +116,7 @@ int middel_cmd(t_data **data, int *status)
         *status = 1;
         return -1;
     }
-    else if (pid == 0)
+    else if ((*data)->pid == 0)
     {
         if ((*data)->cmd->fdin > 2)
         {
@@ -175,14 +174,14 @@ int middel_cmd(t_data **data, int *status)
 
 int last_cmd(t_data **data, int *status)
 {
-    pid_t pid = fork();
-    if (pid == -1)
+    (*data)->pid = fork();
+    if ((*data)->pid == -1)
     {
         perror("fork");
         *status = 1;
         return -1;
     }
-    else if (pid == 0)
+    else if ((*data)->pid == 0)
     {
         if ((*data)->cmd->fdin > 2)
         {

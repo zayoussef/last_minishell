@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/13 17:00:21 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/24 17:45:12 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ void check_option(char **av)
 //         print_av(av + 1, 1);
 // }
 
+
 void build_echo(t_data *data)
 {
     int i;
@@ -87,15 +88,7 @@ void build_echo(t_data *data)
     }
     while (data->cmd->argv[i])
     {
-        if (ft_strcmp(data->cmd->argv[i], "$?") == 0)
-        {
-            ft_putnbr_fd(data->exit_status, fd);
-            data->exit_status = 0;
-        }
-        else
-        {
-            ft_putstr_fd(data->cmd->argv[i], fd);
-        }
+        ft_putstr_fd(data->cmd->argv[i], fd);
         if (data->cmd->argv[i + 1])
             ft_putstr_fd(" ", fd);
         i++;
