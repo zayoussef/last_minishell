@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/24 18:18:27 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/24 19:24:40 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,15 @@ void singel_cmd(t_data *data, int *status)
         }
         else if (data->pid == 0)
         {
+            if (data->cmd->fdin > 2)
+            {
+                if (dup2(data->cmd->fdin, STDIN_FILENO) == -1)
+                {
+                    perror("dup2 middel_command fdin");
+                    exit(EXIT_FAILURE);
+                }
+                close(data->cmd->fdin);
+            }
             if (data->cmd->fdout != STDOUT_FILENO)
             {
                 if (dup2(data->cmd->fdout, STDOUT_FILENO) == -1)
