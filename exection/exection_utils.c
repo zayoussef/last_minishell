@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/16 15:07:10 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/24 18:19:09 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,20 +112,18 @@ char **list_to_char(t_env_node *env_list)
     cur = env_list;
     while (cur)
     {
-        temp = ft_strjoin(cur->name, "="); // Create the key=value string
+        temp = ft_strjoin(cur->name, "="); // Create the name=value string
         if (!temp)
-        {  // Check if the memory allocation failed
-            // Free previously allocated strings and the array
+        {
             while (i > 0)
                 free(env_array[--i]);
             free(env_array);
             return NULL;
         }
-        env_array[i] = ft_strjoin(temp, cur->value);  // Append the value
-        free(temp);  // Free the temporary string
+        env_array[i] = ft_strjoin(temp, cur->value);
+        free(temp);
         if (!env_array[i])
-        {  // Check if the memory allocation failed
-            // Free previously allocated strings and the array
+        {
             while (i > 0)
                 free(env_array[--i]);
             free(env_array);
@@ -134,7 +132,7 @@ char **list_to_char(t_env_node *env_list)
         i++;
         cur = cur->next;
     }
-    env_array[i] = NULL;  // Null-terminate the array
+    env_array[i] = NULL;
     return env_array;
 }
 
