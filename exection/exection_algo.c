@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/24 19:24:40 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/26 00:59:05 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void first_cmd(t_data **data, int *status)
         close(pipe_fd[0]);
         close(pipe_fd[1]);
         *status = 1;
-        return ;
+        return;
     }
     else if ((*data)->pid == 0)
     {
@@ -90,7 +90,7 @@ void first_cmd(t_data **data, int *status)
             }
             close(pipe_fd[1]);
         }
-        close(pipe_fd[0]); //raed 
+        close(pipe_fd[0]);
         if (check_is_builtin(*(*data)) == 1)
         {
             execute_builtin((*data));
@@ -152,7 +152,7 @@ int middel_cmd(t_data **data, int *status)
                 perror("dup2 middel_command fdout");
                 exit(EXIT_FAILURE);
             }
-            close(pipe_fd[1]);
+            close((*data)->cmd->fdout);
         }
         else
         {
@@ -210,13 +210,22 @@ int last_cmd(t_data **data, int *status)
             }
             close((*data)->fd[0]);
         }
+        if ((*data)->cmd->fdout > 2)
+        {
+            if (dup2((*data)->cmd->fdout, STDOUT_FILENO) == -1)
+            {
+                perror("dup2 last_cmd fdout");
+                exit(EXIT_FAILURE);
+            }
+            close((*data)->cmd->fdout);
+        }
         if (check_is_builtin(*(*data)) == 1)
         {
             execute_builtin((*data));
             exit((*data)->exit_status);
         }
         else
-            run_execution((*data));
+            run_execution(*data);
     }
     else
         close((*data)->fd[0]);
