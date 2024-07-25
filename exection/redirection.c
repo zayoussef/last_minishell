@@ -13,30 +13,30 @@ void skip_whitespace(const char **p)
         (*p)++;
 }
 
-void next_type(Redirection **redir,Command **current)
+void next_type(Redirection **redir, Command **current)
 {
     Redirection *temp;
-    if ((*redir)->type == TOKEN_REDIRECT_IN || (*redir)->type == TOKEN_APPEND_OUT
-    || (*redir)->type == TOKEN_REDIRECT_OUT) 
+    if ((*redir)->type == TOKEN_REDIRECT_IN || (*redir)->type == TOKEN_APPEND_OUT 
+        || (*redir)->type == TOKEN_REDIRECT_OUT) 
     {
-        if((*current)->redirection == NULL)
+        if ((*current)->redirection == NULL)
             (*current)->redirection = (*redir);
         else
         {
             temp = (*current)->redirection;
-            while(temp->next)
+            while (temp->next)
                 temp = temp->next;
             temp->next = (*redir);
         }
     }
     else if ((*redir)->type == TOKEN_HERE_DOC) 
     {
-         if((*current)->heredoc == NULL)
+        if ((*current)->heredoc == NULL)
             (*current)->heredoc = (*redir);
         else
         {
             temp = (*current)->heredoc;
-            while(temp->next)
+            while (temp->next)
                 temp = temp->next;
             temp->next = (*redir);
         }
@@ -53,11 +53,11 @@ void handle_redirection(Token *tokens, int *i, Command **current)
     }
     redir = (Redirection *)malloc(sizeof(Redirection));
     if (!redir)
-        return; // Handle malloc failure
+        return;
     redir->type = tokens[*i].type;
     redir->filename = tokens[++(*i)].value;
     redir->next = NULL;
-    next_type(&redir,current);
+    next_type(&redir, current);
 }
 
 void finalize_command(Command **current, int *argc) 
