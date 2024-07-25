@@ -28,6 +28,27 @@ void free_split(char **arr)
     }
 }
 
+void print_command_structure(Command *cmd) 
+{
+    while (cmd) 
+    {
+        printf("Command: ");
+        for (int i = 0; cmd->argv[i]; i++) 
+            printf("%s ", cmd->argv[i]);
+        printf("\n");
+        if (cmd->redirection) 
+        {
+            Redirection *redir = cmd->redirection;
+            while (redir)
+            {
+                printf("Redirection: Type=%d, Filename=%s\n", redir->type, redir->filename);
+                redir = redir->next;
+            }
+        }
+        cmd = cmd->next;
+    }
+}
+
 int main(int argc, char **argv, char **envp)
 {
     Token   tokens[MAX_TOKENS];
