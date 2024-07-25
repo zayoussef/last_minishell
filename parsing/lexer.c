@@ -125,7 +125,7 @@ void handle_v2(const char **p, char *special, TokenType *type)
             *type = TOKEN_APPEND_OUT;
             (*p)++;
         }
-        else
+        else if(*(*p + 1) != '>')
             *type = TOKEN_REDIRECT_OUT;
     }
     else if (**p == '&')
@@ -155,8 +155,11 @@ void doc_or_in(const char **p, TokenType *type, char *special)
         *type = TOKEN_HERE_DOC;
         (*p)++;
     }
-    else
+    else if(*(*p + 1) != '<')
+    {
+        special[0] = '<';
         *type = TOKEN_REDIRECT_IN;
+    }
 }
 
 void handle_special_characters(const char **p, Token *tokens, int *num_tokens)
