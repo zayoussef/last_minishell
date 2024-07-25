@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/24 21:25:59 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/25 22:57:54 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void wating_processes(t_data *data, int *status)
     {
         pid = wait(&wstatus);
         if (pid == -1)
-            continue;
+            continue ;
     }
     if (WIFEXITED(*status))
         data->exit_status = WEXITSTATUS(*status);
@@ -71,7 +71,7 @@ void wating_processes(t_data *data, int *status)
 void init_execution(t_data *data, int *status)
 {
     if (data->size_cmds == 1)
-        singel_cmd(data, status); // done from where 1 command all test done !
+        singel_cmd(data, status);
     else
     {
         first_cmd(&data, status);
@@ -95,7 +95,7 @@ void execution(t_data *data)
     data->cmd->fdout = 1;
     open_check_redirections(&data);
     if (data->redir_erros == -1)
-        return;
+        return ;
     init_execution(data, &status);
     wating_processes(data, &status);
 }
