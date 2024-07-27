@@ -3,8 +3,6 @@
 void init_command(Command *cmd) 
 {
     cmd->argv = (char **)malloc(MAX_TOKENS * sizeof(char *));
-    if (!cmd->argv)
-        return ;
     cmd->redirection = NULL;
     cmd->heredoc = NULL;
     cmd->next = NULL;
