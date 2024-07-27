@@ -28,24 +28,49 @@ void free_split(char **arr)
     }
 }
 
+void print_redirection(Redirection *redir) 
+{
+    while (redir) {
+        printf("  Redirection: Type=%d, Filename=%s\n", redir->type, redir->filename);
+        redir = redir->next;
+    }
+}
+
 void print_command_structure(Command *cmd) 
 {
     while (cmd) 
     {
+        // Print command arguments
         printf("Command: ");
-        for (int i = 0; cmd->argv[i]; i++) 
+        for (int i = 0; cmd->argv && cmd->argv[i]; i++) 
+        {
             printf("%s ", cmd->argv[i]);
+        }
         printf("\n");
+
+        // Print file descriptors
+        printf("File descriptors:\n");
+        printf("  fdin: %d\n", cmd->fdin);
+        printf("  fdout: %d\n", cmd->fdout);
+
+        // // Print heredoc redirections
+        // if (cmd->heredoc) {
+        //     printf("Heredoc redirections:\n");
+        //     print_redirection(cmd->heredoc);
+        // }
+
+        // Print other redirections
         if (cmd->redirection) 
         {
-            Redirection *redir = cmd->redirection;
-            while (redir)
-            {
-                printf("Redirection: Type=%d, Filename=%s\n", redir->type, redir->filename);
-                redir = redir->next;
-            }
+            printf("Other redirections:\n");
+            print_redirection(cmd->redirection);
         }
+        // if (cmd->redirection == NULL)
+        //     printf("null in cmd->redirection\n");
+
+        // Move to the next command
         cmd = cmd->next;
+        printf("\n");
     }
 }
 
@@ -55,6 +80,7 @@ int main(int argc, char **argv, char **envp)
     Command *cmd;
     t_data  *data;
     char    *line;
+    int check;
     int     nb_token;
 
     (void)argc;
@@ -71,11 +97,14 @@ int main(int argc, char **argv, char **envp)
         if (strlen(line) > 0)
             add_history(line);
         nb_token = 0;
-        lex(line, tokens, &nb_token,data->env_list);
-        if (check_syntaxe(tokens, nb_token))
+        check = check_syntaxe(tokens, nb_token);
+        if (lex(line, tokens, &nb_token,data->env_list) ||check)
         {
-            free(line);
-            continue ;
+            if(check != 10)
+            {
+                free(line);
+                continue;
+            }
         }
         cmd = parse(tokens);
         if (cmd)
@@ -94,3 +123,4 @@ int main(int argc, char **argv, char **envp)
     }
     return (data->exit_status);
 }
+

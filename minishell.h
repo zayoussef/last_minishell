@@ -108,9 +108,14 @@ typedef struct
     int in_quotes;
     char quote_char;
     char buffer[1024];
+    bool status;
     int buffer_index;
     t_env_node *env;
 } QuoteWordParserState;
+
+/********************Dubag**************************/
+void print_command_structure(Command *cmd) ;
+
 
 void handle_word(Token *tokens, int *i, Command **current, int *argc);
 void add_command_to_list(Command **head, Command *current);
@@ -181,6 +186,7 @@ void singel_cmd(t_data *data, int *status);
 void first_cmd(t_data **data, int *status);
 int middel_cmd(t_data **data, int *status);
 int last_cmd(t_data **data, int *status);
+void multiple_cmd(t_data **data, int *status);
 void handle_sigint(int sig);
 t_data *get_global_data(void);
 int ft_strlnode(Command *cmd);

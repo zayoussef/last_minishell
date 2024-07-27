@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/25 22:57:54 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/27 18:13:46 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,14 +74,11 @@ void init_execution(t_data *data, int *status)
         singel_cmd(data, status);
     else
     {
-        first_cmd(&data, status);
-        data->cmd = data->cmd->next;
-        while (data->cmd->next != NULL)
+        while (data->cmd != NULL)
         {
-            middel_cmd(&data, status);
+            multiple_cmd(&data, status);
             data->cmd = data->cmd->next;
         }
-        last_cmd(&data, status);
     }
 }
 
@@ -96,6 +93,7 @@ void execution(t_data *data)
     open_check_redirections(&data);
     if (data->redir_erros == -1)
         return ;
+    // print_command_structure(data->cmd);
     init_execution(data, &status);
     wating_processes(data, &status);
 }
