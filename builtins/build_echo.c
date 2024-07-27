@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/27 17:49:08 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/27 23:50:40 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void check_option(char **av, int fd)
 void build_echo(t_data *data)
 {
     int fd;
-
+// echo "salam hey" > ff | cat ff 
     if (data->cmd->next)
         fd = 1;
     else

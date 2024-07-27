@@ -81,6 +81,7 @@ typedef struct Command
     char **argv;              // Arguments array
     int fdin;                 //
     int fdout;                //
+    int redir_erros;          //
     struct Command *next;     // Pointer to next command
 } Command;
 
@@ -93,14 +94,12 @@ typedef struct s_data
     pid_t last_pid;
     pid_t pid;
     Command *cmd;
-    char **av;
     char **env;
+    char **av;
     int ac;
     int fd[2];
     int size_cmds;
     int exit_status;
-    int exit_signal;
-    int redir_erros;
 } t_data;
 
 extern t_data g_data;
@@ -145,8 +144,8 @@ void free_redirection(Redirection *redir);
 void free_all_v2(Command *current);
 
 /*****************************REIRECTION_OPEN_FILE*****************************************/
-void redirection_in_out(t_data **data, Command *cmd);
-void open_check_redirections(t_data **data);
+void redirection_in_out(t_data *data, Command *cmd);
+void open_check_redirections(t_data *data);
 
 /********************parsing_tools********************/
 void ft_strncpy(char *dest, const char *src, int n);
@@ -185,10 +184,7 @@ int check_is_builtin(t_data data);
 void init_execution(t_data *data, int *status);
 void run_execution(t_data *data);
 void singel_cmd(t_data *data, int *status);
-void first_cmd(t_data **data, int *status);
-int middel_cmd(t_data **data, int *status);
-int last_cmd(t_data **data, int *status);
-void multiple_cmd(t_data **data, int *status);
+void multiple_cmd(t_data *data, int *status);
 void handle_sigint(int sig);
 t_data *get_global_data(void);
 int ft_strlnode(Command *cmd);

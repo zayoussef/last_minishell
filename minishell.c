@@ -35,9 +35,10 @@ void print_redirection(Redirection *redir) {
     }
 }
 
-void print_command_structure(Command *cmd) 
+void print_command_structure(Command *cmd)
 {
-    while (cmd) {
+    while (cmd) 
+    {
         // Print command arguments
         printf("Command: ");
         for (int i = 0; cmd->argv && cmd->argv[i]; i++) 
@@ -50,6 +51,7 @@ void print_command_structure(Command *cmd)
         printf("File descriptors:\n");
         printf("  fdin: %d\n", cmd->fdin);
         printf("  fdout: %d\n", cmd->fdout);
+        printf("  redir_erros: %d\n", cmd->redir_erros);
 
         // // Print heredoc redirections
         // if (cmd->heredoc) {

@@ -6,13 +6,13 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/07/27 17:22:35 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/27 23:51:51 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void open_file(t_data **data, Command *cmd, Redirection *redir)
+void open_file(t_data *data, Command *cmd, Redirection *redir)
 {
     int fd;
 
@@ -29,8 +29,8 @@ void open_file(t_data **data, Command *cmd, Redirection *redir)
         ft_putstr_fd("minishell: ", 2);
         ft_putstr_fd(redir->filename, 2);
         perror(" ");
-        (*data)->exit_status = 1;
-        (*data)->redir_erros = -1;
+        data->exit_status = 1;
+        cmd->redir_erros = -1;
         return;
     }
 
@@ -40,7 +40,7 @@ void open_file(t_data **data, Command *cmd, Redirection *redir)
         cmd->fdout = fd;
 }
 
-void check_permissions(t_data **data, Command *cmd, TokenType type)
+void check_permissions(t_data *data, Command *cmd, TokenType type)
 {
     int access_result;
 
@@ -53,40 +53,13 @@ void check_permissions(t_data **data, Command *cmd, TokenType type)
         ft_putstr_fd("minishell: ", 2);
         ft_putstr_fd(cmd->redirection->filename, 2);
         ft_putstr_fd(": Permission denied\n", 2);
-        (*data)->exit_status = 1;
-        (*data)->redir_erros = -1;
+        data->exit_status = 1;
+        cmd->redir_erros = -1;
         return;
     }
 }
 
-// void handle_heredoc(t_data *data, Redirection *redir)
-// {
-//     int pipe_fd[2];
-//     char *line;
-
-//     if (pipe(pipe_fd) == -1)
-//     {
-//         perror("pipe");
-//         data->redir_erros = -1;
-//         return;
-//     }
-//     while (1)
-//     {
-//         line = readline("> ");
-//         if (!line || ft_strcmp(line, redir->filename) == 0)
-//         {
-//             free(line);
-//             break;
-//         }
-//         write(pipe_fd[1], line, ft_strlen(line));
-//         write(pipe_fd[1], "\n", 1);
-//         free(line);
-//     }
-//     close(pipe_fd[1]);
-//     data->cmd->fdin = pipe_fd[0];
-// }
-
-void redirection_in_out(t_data **data, Command *cmd)
+void redirection_in_out(t_data *data, Command *cmd)
 {
     Redirection *redir = cmd->redirection;
 
@@ -97,36 +70,31 @@ void redirection_in_out(t_data **data, Command *cmd)
             ft_putstr_fd("minishell: ", 2);
             ft_putstr_fd(redir->filename, 2);
             ft_putstr_fd(": No such file or directory\n", 2);
-            (*data)->exit_status = 1;
-            (*data)->redir_erros = -1;
-            return;
+            data->exit_status = 1;
+            cmd->redir_erros = -1;
+            return ;
         }
         else if (access(redir->filename, F_OK) != -1)
         {
             check_permissions(data, cmd, redir->type);
-            if ((*data)->redir_erros == -1)
-                return;
+            if (data->cmd->redir_erros == -1)
+                return ;
         }
         open_file(data, cmd, redir);
-        if ((*data)->redir_erros == -1)
+        if (data->cmd->redir_erros == -1)
             return ;
         redir = redir->next;
     }
 }
 
-void open_check_redirections(t_data **data)
+void open_check_redirections(t_data *data)
 {
     Command *current_cmd;
 
-    current_cmd = (*data)->cmd;
+    current_cmd = data->cmd;
     while (current_cmd != NULL)
     {
-        current_cmd->fdin = 0;
-        current_cmd->fdout = 1;
-        (*data)->redir_erros = 0;
         redirection_in_out(data, current_cmd);
-        if ((*data)->redir_erros == -1)
-            return ;
         current_cmd = current_cmd->next;
     }
 }

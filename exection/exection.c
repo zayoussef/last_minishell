@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/27 18:13:46 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/28 00:30:45 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,6 @@ void handle_sigint(int sig)
 t_data *get_global_data(void)
 {
     g_data.exit_status = 0;
-    g_data.exit_signal = 0;
-    g_data.redir_erros = 0;
     return &g_data;
 }
 
@@ -76,9 +74,25 @@ void init_execution(t_data *data, int *status)
     {
         while (data->cmd != NULL)
         {
-            multiple_cmd(&data, status);
+            if (data->cmd->redir_erros == -1)
+                data->cmd = data->cmd->next;
+            multiple_cmd(data, status);
             data->cmd = data->cmd->next;
         }
+    }
+}
+
+void fill_cmd(t_data *data)
+{
+    Command *curr_cmd;
+
+    curr_cmd = data->cmd;
+    while (curr_cmd != NULL)
+    {
+        curr_cmd->redir_erros = 0;
+        curr_cmd->fdin = 0;
+        curr_cmd->fdout = 1;
+        curr_cmd = curr_cmd->next;
     }
 }
 
@@ -87,13 +101,8 @@ void execution(t_data *data)
     int status;
 
     status = 0;
-    data->redir_erros = 0;
-    data->cmd->fdin = 0;
-    data->cmd->fdout = 1;
-    open_check_redirections(&data);
-    if (data->redir_erros == -1)
-        return ;
-    // print_command_structure(data->cmd);
+    fill_cmd(data);
+    open_check_redirections(data);
     init_execution(data, &status);
     wating_processes(data, &status);
 }
