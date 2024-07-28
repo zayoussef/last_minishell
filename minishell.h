@@ -26,7 +26,7 @@
 #include <readline/history.h>
 #include "libft/libft.h"
 
-#define PATH_ENV "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+#define PWD_ERROR_MSG "minishell: pwd: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory"
 
 typedef struct s_env_node
 {
@@ -188,6 +188,8 @@ void multiple_cmd(t_data *data, int *status);
 void handle_sigint(int sig);
 t_data *get_global_data(void);
 int ft_strlnode(Command *cmd);
+int count_env_nodes(t_env_node *env_list);
+void	fill_cmd(t_data *data);
 void wating_processes(t_data *data, int *status);
 void init_execution(t_data *data, int *status);
 void execution(t_data *data);

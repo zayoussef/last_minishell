@@ -28,8 +28,10 @@ void free_split(char **arr)
     }
 }
 
-void print_redirection(Redirection *redir) {
-    while (redir) {
+void print_redirection(Redirection *redir)
+{
+    while (redir)
+    {
         printf("  Redirection: Type=%d, Filename=%s\n", redir->type, redir->filename);
         redir = redir->next;
     }
@@ -37,11 +39,11 @@ void print_redirection(Redirection *redir) {
 
 void print_command_structure(Command *cmd)
 {
-    while (cmd) 
+    while (cmd)
     {
         // Print command arguments
         printf("Command: ");
-        for (int i = 0; cmd->argv && cmd->argv[i]; i++) 
+        for (int i = 0; cmd->argv && cmd->argv[i]; i++)
         {
             printf("%s ", cmd->argv[i]);
         }
@@ -60,7 +62,8 @@ void print_command_structure(Command *cmd)
         // }
 
         // Print other redirections
-        if (cmd->redirection) {
+        if (cmd->redirection)
+        {
             printf("Other redirections:\n");
             print_redirection(cmd->redirection);
         }
@@ -75,12 +78,12 @@ int check_parse(Redirection *redir)
 {
     Redirection *temp;
     temp = redir;
-    while(temp)
+    while (temp)
     {
-        if(!ft_strcmp(temp->filename,"?"))
+        if (!ft_strcmp(temp->filename, "?"))
             return 1;
-        else if(!ft_strcmp(temp->filename,"#"))
-        return(ft_putstr_fd("syntax error near unexpected token `newline'\n",2),1);
+        else if (!ft_strcmp(temp->filename, "#"))
+            return (ft_putstr_fd("syntax error near unexpected token `newline'\n", 2), 1);
         temp = temp->next;
     }
     return 0;
@@ -88,11 +91,11 @@ int check_parse(Redirection *redir)
 
 int main(int argc, char **argv, char **envp)
 {
-    Token   tokens[MAX_TOKENS];
+    Token tokens[MAX_TOKENS];
     Command *cmd;
-    t_data  *data;
-    char    *line;
-    int     nb_token;
+    t_data *data;
+    char *line;
+    int nb_token;
 
     (void)argc;
     (void)argv;
@@ -108,27 +111,25 @@ int main(int argc, char **argv, char **envp)
         if (strlen(line) > 0)
             add_history(line);
         nb_token = 0;
-        
-        if (lex(line, tokens, &nb_token,data->env_list) ||(check_syntaxe(tokens, nb_token)))
+        if (lex(line, tokens, &nb_token, data->env_list) || (check_syntaxe(tokens, nb_token)))
         {
             free(line);
             continue;
         }
         cmd = parse(tokens);
-        if(cmd && check_parse(cmd->redirection) == 1)
+        if (cmd && check_parse(cmd->redirection) == 1)
+        {
+            free_redirection(cmd->redirection);
+            Command *temp;
+            if (cmd->next)
             {
-                free_redirection(cmd->redirection);
-                Command *temp;
-                if(cmd->next)
-                {
                 temp = cmd->next;
                 free(cmd);
                 cmd = temp;
-                }
-                else
-                    continue;
             }
-        
+            else
+                continue;
+        }
         if (cmd)
         {
             data->cmd = cmd;
@@ -137,7 +138,7 @@ int main(int argc, char **argv, char **envp)
             data->size_cmds = ft_strlnode(data->cmd);
             execution(data);
             // print_command_structure(cmd);
-            if(line)
+            if (line)
                 free(line);
             free_all_resources(cmd);
         }

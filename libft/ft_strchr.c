@@ -26,7 +26,7 @@ int	ft_strchr(char *s, char c)
 	return (0);
 }
 
-char *ft_strrch_finder(char *s, char c)
+char	*ft_strrch_finder(char *s, char c)
 {
 	int	i;
 

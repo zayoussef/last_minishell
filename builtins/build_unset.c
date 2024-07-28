@@ -12,38 +12,40 @@
 
 #include "../minishell.h"
 
-void remov_env(t_env_node **env, t_env_node *elem)
+void	remov_env(t_env_node **env, t_env_node *elem)
 {
-    t_env_node *current = *env;
-    t_env_node *prev = NULL;
+	t_env_node	*current;
+	t_env_node	*prev;
 
-    while (current)
-    {
-        if (current == elem)
-        {
-            if (prev)
-                prev->next = current->next;
-            else
-                *env = current->next;
-            free(current->name);
-            free(current->value);
-            free(current);
-            return ;
-        }
-        prev = current;
-        current = current->next;
-    }
+	current = *env;
+	prev = NULL;
+	while (current)
+	{
+		if (current == elem)
+		{
+			if (prev)
+				prev->next = current->next;
+			else
+				*env = current->next;
+			free(current->name);
+			free(current->value);
+			free(current);
+			return ;
+		}
+		prev = current;
+		current = current->next;
+	}
 }
 
-t_env_node *find_env(t_env_node *env, const char *name) 
+t_env_node	*find_env(t_env_node *env, const char *name)
 {
-    while (env) 
-    {
-        if (strcmp(env->name, name) == 0)
-            return (env);
-        env = env->next;
-    }
-    return NULL;
+	while (env)
+	{
+		if (strcmp(env->name, name) == 0)
+			return (env);
+		env = env->next;
+	}
+	return (NULL);
 }
 
 // void unset_env(char *arg, t_env_node **env)
@@ -66,27 +68,26 @@ t_env_node *find_env(t_env_node *env, const char *name)
 //     }
 // }
 
-void unset_env(char *arg, t_env_node **env)
+void	unset_env(char *arg, t_env_node **env)
 {
-    t_env_node *curr;
+	t_env_node	*curr;
 
-    if (!*env)
-        return ;
-
-    curr = find_env(*env, arg);
-    if (curr)
-        remov_env(env, curr);
+	if (!*env)
+		return ;
+	curr = find_env(*env, arg);
+	if (curr)
+		remov_env(env, curr);
 }
 
-void build_unset(t_data *data)
+void	build_unset(t_data *data)
 {
-    int i;
+	int	i;
 
-    i = 1;
-    while (data->av[i])
-    {
-        unset_env(data->av[i], &(data->env_list));
-        i++;
-    }
-    data->exit_status = 0;
+	i = 1;
+	while (data->av[i])
+	{
+		unset_env(data->av[i], &(data->env_list));
+		i++;
+	}
+	data->exit_status = 0;
 }

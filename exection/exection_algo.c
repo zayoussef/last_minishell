@@ -6,137 +6,112 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/28 00:27:44 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/28 22:36:45 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void singel_cmd(t_data *data, int *status)
+void	ft_dup_in(t_data *data)
 {
-    if (check_is_builtin(*data) == 1)
-        run_builtin(data, status);
-    else
-    {
-        data->pid = fork();
-        if (data->pid == -1)
-        {
-            perror("fork");
-            *status = 1;
-            return ;
-        }
-        else if (data->pid == 0)
-        {
-            if (data->cmd->fdin > 2)
-            {
-                if (dup2(data->cmd->fdin, STDIN_FILENO) == -1)
-                {
-                    perror("dup2 single_cmd fdin");
-                    exit(EXIT_FAILURE);
-                }
-                close(data->cmd->fdin);
-            }
-            if (data->cmd->fdout != STDOUT_FILENO)
-            {
-                if (dup2(data->cmd->fdout, STDOUT_FILENO) == -1)
-                {
-                    perror("dup2 single_cmd fdout");
-                    exit(EXIT_FAILURE);
-                }
-                close(data->cmd->fdout);
-            }
-            run_execution(data);
-            exit(EXIT_SUCCESS);
-        }
-    }
+	if (dup2(data->cmd->fdin, STDIN_FILENO) == -1)
+	{
+		perror("dup2 single_cmd fdin");
+		exit(EXIT_FAILURE);
+	}
+	close(data->cmd->fdin);
 }
 
-void multiple_cmd(t_data *data, int *status)
+void	ft_dup_out(t_data *data, int i)
 {
-    int pipe_fd[2];
+	if (i == 1)
+	{
+		data->cmd->fdin = 0;
+		data->cmd->fdout = 1;
+	}
+	else
+	{
+		if (dup2(data->cmd->fdout, STDOUT_FILENO) == -1)
+		{
+			perror("dup2 single_cmd fdout");
+			exit(EXIT_FAILURE);
+		}
+		close(data->cmd->fdout);
+	}
+}
 
-    // Create a pipe for inter-process communication
-    if (pipe(pipe_fd) == -1)
-    {
-        perror("pipe");
-        *status = 1;
-        return;
-    }
+void	handle_child_process(t_data *data, int pipe_fd[2])
+{
+	if (data->cmd->fdin > 2)
+		ft_dup_in(data);
+	else if (data->fd[0] > 2)
+	{
+		dup2(data->fd[0], STDIN_FILENO);
+		close(data->fd[0]);
+	}
+	if (data->cmd->fdout > 2)
+		ft_dup_out(data, 0);
+	else if (data->cmd->next)
+		dup2(pipe_fd[1], STDOUT_FILENO);
+	close(pipe_fd[1]);
+	close(pipe_fd[0]);
+	ft_dup_out(data, 1);
+	if (check_is_builtin(*data))
+		execute_builtin(data);
+	else
+		run_execution(data);
+	exit(data->exit_status);
+}
 
-    // Fork the process
-    data->pid = fork();
-    if (data->pid == -1)
-    {
-        perror("fork");
-        *status = 1;
-        return;
-    }
-    else if (data->pid == 0)
-    {
-        // Child process
+void	singel_cmd(t_data *data, int *status)
+{
+	if (check_is_builtin(*data) == 1)
+		run_builtin(data, status);
+	else
+	{
+		data->pid = fork();
+		if (data->pid == -1)
+		{
+			perror("fork");
+			*status = 1;
+			return ;
+		}
+		else if (data->pid == 0)
+		{
+			if (data->cmd->fdin > 2)
+				ft_dup_in(data);
+			if (data->cmd->fdout != STDOUT_FILENO)
+				ft_dup_out(data, 0);
+			run_execution(data);
+			exit(EXIT_SUCCESS);
+		}
+	}
+}
 
-        // Handle input redirection
-        if (data->cmd->fdin > 2)
-        {
-            if (dup2(data->cmd->fdin, STDIN_FILENO) == -1)
-            {
-                perror("dup2 multiple_cmd fdin");
-                exit(EXIT_FAILURE);
-            }
-            close(data->cmd->fdin);
-        }
-        else if (data->fd[0] > 2)
-        {
-            if (dup2(data->fd[0], STDIN_FILENO) == -1)
-            {
-                perror("dup2 multiple_cmd data->fd[0]");
-                exit(EXIT_FAILURE);
-            }
-            close(data->fd[0]);
-        }
-        // Handle output redirection
-        if (data->cmd->fdout > 2)
-        {
-            if (dup2(data->cmd->fdout, STDOUT_FILENO) == -1)
-            {
-                perror("dup2 multiple_cmd fdout");
-                exit(EXIT_FAILURE);
-            }
-            close(data->cmd->fdout);
-        }
-        else if (data->cmd->next)
-        {
-            if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
-            {
-                perror("dup2 multiple_cmd pipe_fd[1]");
-                exit(EXIT_FAILURE);
-            }
-            close(pipe_fd[1]);
-        }
-        else
-        {
-            close(pipe_fd[1]);
-        }
-        close(pipe_fd[0]);
-        // Execute the command
-        if (check_is_builtin(*data) == 1)
-        {
-            execute_builtin(data);
-            exit(data->exit_status);
-        }
-        else
-            run_execution(data);
-        exit(EXIT_SUCCESS);
-    }
-    else
-    {
-        // Parent process
-        close(pipe_fd[1]);
-        if (data->fd[0] > 2)
-        {
-            close(data->fd[0]);
-        }
-        // Pass the read end of the pipe to the next command
-        data->fd[0] = pipe_fd[0];
-    }
+void	multiple_cmd(t_data *data, int *status)
+{
+	int	pipe_fd[2];
+
+	if (pipe(pipe_fd) == -1)
+	{
+		perror("pipe");
+		*status = 1;
+		return ;
+	}
+	data->pid = fork();
+	if (data->pid == -1)
+	{
+		perror("fork");
+		*status = 1;
+		return ;
+	}
+	else if (data->pid == 0)
+		handle_child_process(data, pipe_fd);
+	else
+	{
+		close(pipe_fd[1]);
+		if (data->fd[0] > 2)
+			close(data->fd[0]);
+		data->fd[0] = pipe_fd[0];
+	}
 }
