@@ -146,6 +146,7 @@ void free_all_v2(Command *current);
 /*****************************REIRECTION_OPEN_FILE*****************************************/
 void redirection_in_out(t_data *data, Command *cmd);
 void open_check_redirections(t_data *data);
+void	add_redirection(Redirection **redir_list, Redirection *redir);
 
 /********************parsing_tools********************/
 void ft_strncpy(char *dest, const char *src, int n);

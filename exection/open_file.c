@@ -6,11 +6,26 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/07/28 23:16:54 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/29 15:51:45 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+void	add_redirection(Redirection **redir_list, Redirection *redir)
+{
+	Redirection	*temp;
+
+	temp = *redir_list;
+	if (temp == NULL)
+		*redir_list = redir;
+	else
+	{
+		while (temp->next)
+			temp = temp->next;
+		temp->next = redir;
+	}
+}
 
 void	open_file(t_data *data, Command *cmd, Redirection *redir)
 {

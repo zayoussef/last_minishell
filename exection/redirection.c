@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/07/28 23:24:57 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/07/29 15:51:35 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,21 +23,6 @@ void	skip_whitespace(const char **p)
 {
 	while (ft_isspace(**p))
 		(*p)++;
-}
-
-void	add_redirection(Redirection **redir_list, Redirection *redir)
-{
-	Redirection	*temp;
-
-	temp = *redir_list;
-	if (temp == NULL)
-		*redir_list = redir;
-	else
-	{
-		while (temp->next)
-			temp = temp->next;
-		temp->next = redir;
-	}
 }
 
 void	next_type(Redirection **redir, Command **current)
