@@ -97,7 +97,7 @@ int	main(int argc, char **argv, char **envp)
 	t_data	*data;
 	char	*line;
 	int		nb_token;
-			Command *temp;
+	Command	*temp;
 
 	(void)argc;
 	(void)argv;
