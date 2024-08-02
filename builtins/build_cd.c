@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 15:03:14 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/02 22:50:12 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/03 00:43:16 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ int check_directory_permissions(char *path, t_data *data)
     if (stat(path, &statbuf) != 0)
     {
         perror("minishell: cd");
+        data->exit_status = 1;
         return (0);
     }
     if (!S_ISDIR(statbuf.st_mode))
@@ -34,7 +35,7 @@ int check_directory_permissions(char *path, t_data *data)
         ft_putstr_fd("minishell: cd: permission denied: ", 2);
         ft_putstr_fd(path, 2);
         ft_putstr_fd("\n", 2);
-        data->exit_status = 1; // hes print 129 ????? should print 1!
+        data->exit_status = 1;
         return (0);
     }
     return 1;
