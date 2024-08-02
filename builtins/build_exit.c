@@ -47,7 +47,8 @@ void	build_exit(char **av)
 	long long	rs;
 
 	g_data.exit_status = 0;
-	ft_putstr_fd("exit\n", STDERR_FILENO);
+	if (!g_data.is_pipeline)
+		ft_putstr_fd("exit\n", STDERR_FILENO);
 	if (av[1])
 	{
 		if (!validate_exit_argument(av[1], &rs))

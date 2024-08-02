@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/28 23:02:58 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/02 19:59:58 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,19 +39,22 @@ int	count_env_nodes(t_env_node *env_list)
 	return (count);
 }
 
-char	*create_env_entry(t_env_node *node)
+char *create_env_entry(t_env_node *node)
 {
-	char	*temp;
-	char	*env_entry;
+    char *temp;
+    char *env_entry;
 
-	env_entry = NULL;
-	temp = ft_strjoin(node->name, "=");
-	if (temp)
+    env_entry = NULL;
+    temp = ft_strjoin(node->name, "=");
+    if (temp)
 	{
-		env_entry = ft_strjoin(temp, node->value);
-		free(temp);
-	}
-	return (env_entry);
+        if (node->value)
+            env_entry = ft_strjoin(temp, node->value);
+		else
+            env_entry = ft_strdup(temp);
+        free(temp);
+    }
+    return (env_entry);
 }
 
 char	**list_to_char(t_env_node *env_list)
@@ -64,7 +67,7 @@ char	**list_to_char(t_env_node *env_list)
 	cur = env_list;
 	count = count_env_nodes(env_list);
 	i = 0;
-	env_array = (char **)malloc(sizeof(char *) * (count + 1));
+	env_array = malloc(sizeof(char *) * (count + 1));
 	if (!env_array)
 		return (NULL);
 	while (cur)

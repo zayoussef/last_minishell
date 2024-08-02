@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 18:37:48 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/28 19:58:00 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/02 20:05:45 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,6 @@ void	build_export(t_data *data)
 			ft_putstr_fd(data->av[i], fd);
 			ft_putstr_fd("`: not a valid identifier\n", fd);
 			data->exit_status = EXIT_FAILURE;
-			return ;
 		}
 		else
 			handle_export(&(data->env_list), data->av[i]);

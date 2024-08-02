@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/28 19:54:49 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/02 22:15:01 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,13 @@ void	build_env(t_data *data)
 	{
 		while (curr)
 		{
-			ft_putstr_fd(curr->name, fd);
-			ft_putstr_fd("=", fd);
-			ft_putstr_fd(curr->value, fd);
-			ft_putstr_fd("\n", fd);
+			if (curr->value)
+			{
+				ft_putstr_fd(curr->name, fd);
+				ft_putstr_fd("=", fd);
+				ft_putstr_fd(curr->value, fd);
+				ft_putstr_fd("\n", fd);
+			}
 			curr = curr->next;
 		}
 	}

@@ -13,7 +13,7 @@
 #ifndef MINISHELL_H
 #define MINISHELL_H
 
-#include <limits.h>
+#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -100,6 +100,7 @@ typedef struct s_data
     int fd[2];
     int size_cmds;
     int exit_status;
+    int is_pipeline;
 } t_data;
 
 extern t_data g_data;

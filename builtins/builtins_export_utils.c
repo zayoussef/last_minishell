@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 18:37:48 by yozainan          #+#    #+#             */
-/*   Updated: 2024/05/29 12:50:46 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/02 21:22:12 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	handle_new_env(t_env_node **env_list, char *arg)
 		free(name);
 		return ;
 	}
-	value = ft_strdup("");
+	value = NULL;
 	update_or_add_env(env_list, name, value);
 }
 
