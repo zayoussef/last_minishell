@@ -112,6 +112,7 @@ int	main(int argc, char **argv, char **envp)
 			break ;
 		if (strlen(line) > 0)
 			add_history(line);
+		signal(SIGINT, SIG_IGN);
 		nb_token = 0;
 		if (lex(line, tokens, &nb_token, data->env_list)
 			|| (check_syntaxe(tokens, nb_token)))

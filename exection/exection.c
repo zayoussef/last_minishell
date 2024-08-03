@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/02 19:02:01 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/03 19:37:25 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,8 @@ void	execution(t_data *data)
 	status = 0;
 	fill_cmd(data);
 	open_check_redirections(data);
+	if (data->cmd->redir_erros == -1)
+		return ;
 	data->is_pipeline = (data->size_cmds > 1);
 	init_execution(data, &status);
 	wating_processes(data, &status);
