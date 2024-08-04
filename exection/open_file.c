@@ -6,15 +6,15 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/07/29 15:51:45 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/04 06:32:34 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	add_redirection(Redirection **redir_list, Redirection *redir)
+void add_redirection(Redirection **redir_list, Redirection *redir)
 {
-	Redirection	*temp;
+	Redirection *temp;
 
 	temp = *redir_list;
 	if (temp == NULL)
@@ -27,11 +27,18 @@ void	add_redirection(Redirection **redir_list, Redirection *redir)
 	}
 }
 
-void	open_file(t_data *data, Command *cmd, Redirection *redir)
+void open_file(t_data *data, Command *cmd, Redirection *redir)
 {
-	int	fd;
+	int fd;
 
 	fd = -1;
+	if (!ft_strcmp(redir->filename, "\"\"") || !ft_strcmp(redir->filename, "\'\'"))
+	{
+		ft_putstr_fd("minishell: : No such file or directory \n", 2);
+		data->exit_status = 1;
+		cmd->redir_erros = -1;
+		return ;
+	}
 	if (redir->type == TOKEN_REDIRECT_IN)
 		fd = open(redir->filename, O_RDONLY);
 	else if (redir->type == TOKEN_REDIRECT_OUT)
@@ -45,7 +52,7 @@ void	open_file(t_data *data, Command *cmd, Redirection *redir)
 		perror(" ");
 		data->exit_status = 1;
 		cmd->redir_erros = -1;
-		return ;
+		return;
 	}
 	if (redir->type == TOKEN_REDIRECT_IN)
 		cmd->fdin = fd;
@@ -53,9 +60,9 @@ void	open_file(t_data *data, Command *cmd, Redirection *redir)
 		cmd->fdout = fd;
 }
 
-void	check_permissions(t_data *data, Command *cmd, TokenType type)
+void check_permissions(t_data *data, Command *cmd, TokenType type)
 {
-	int	access_result;
+	int access_result;
 
 	if (type == TOKEN_REDIRECT_IN)
 		access_result = access(cmd->redirection->filename, R_OK);
@@ -68,13 +75,13 @@ void	check_permissions(t_data *data, Command *cmd, TokenType type)
 		ft_putstr_fd(": Permission denied\n", 2);
 		data->exit_status = 1;
 		cmd->redir_erros = -1;
-		return ;
+		return;
 	}
 }
 
-void	redirection_in_out(t_data *data, Command *cmd)
+void redirection_in_out(t_data *data, Command *cmd)
 {
-	Redirection	*redir;
+	Redirection *redir;
 
 	redir = cmd->redirection;
 	while (redir != NULL)
@@ -88,22 +95,25 @@ void	redirection_in_out(t_data *data, Command *cmd)
 				ft_putstr_fd(": No such file or directory\n", 2);
 				data->exit_status = 1;
 				cmd->redir_erros = -1;
-				return ;
+				return;
 			}
 			check_permissions(data, cmd, redir->type);
 			if (data->cmd->redir_erros == -1)
-				return ;
+				return;
 		}
-		open_file(data, cmd, redir);
-		if (data->cmd->redir_erros == -1)
-			return ;
+		if (redir->type != TOKEN_HERE_DOC)
+		{
+			open_file(data, cmd, redir);
+			if (data->cmd->redir_erros == -1)
+				return;
+		}
 		redir = redir->next;
 	}
 }
 
-void	open_check_redirections(t_data *data)
+void open_check_redirections(t_data *data)
 {
-	Command	*current_cmd;
+	Command *current_cmd;
 
 	current_cmd = data->cmd;
 	while (current_cmd != NULL)

@@ -12,7 +12,7 @@ SRC = minishell.c libft/ft_atoll.c libft/ft_putchar_fd.c libft/ft_putendl_fd.c l
         libft/ft_strdup.c builtins/builtins_export_utils.c parsing/free_parsing.c parsing/init_parsing.c parsing/lexer.c \
         parsing/parsing.c parsing/parsing_tools.c exection/redirection.c exection/open_file.c parsing/config_mini.c \
         exection/builtins_utils.c exection/exection_utils.c exection/exection.c exection/exection_algo.c exection/exection_utils1.c \
-        exection/exection_utils2.c
+        exection/exection_utils2.c exection/build_her_doc.c
 
 OBJS = $(SRC:.c=.o)
 

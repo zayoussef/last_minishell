@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/07/29 15:51:35 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/04 05:54:39 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,11 @@
 void	add_token(Token *tokens, int *num_tokens, TokenType type, char *value)
 {
 	tokens[*num_tokens].type = type;
-	tokens[*num_tokens].value = ft_strdup(value);
-	(*num_tokens)++;
+    if (value == NULL)
+        tokens[*num_tokens].value = NULL;
+    else
+        tokens[*num_tokens].value = ft_strdup(value);
+    (*num_tokens)++;
 }
 
 void	skip_whitespace(const char **p)

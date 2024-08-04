@@ -52,6 +52,7 @@ typedef enum
     TOKEN_REDIRECT_OUT,
     TOKEN_APPEND_OUT,
     TOKEN_HERE_DOC,
+    TOKEN_HERE_DOC_NO,
     TOKEN_BACKGROUND,
     TOKEN_AND,
     TOKEN_LPR,
@@ -89,12 +90,8 @@ typedef struct Command
 typedef struct s_data
 {
     t_env_node *env_list;
-    pid_t singel_pid;
-    pid_t first_pid;
-    pid_t middel_pid;
-    pid_t last_pid;
-    pid_t pid;
     Command *cmd;
+    pid_t pid;
     char **env;
     char **av;
     int ac;
@@ -106,19 +103,31 @@ typedef struct s_data
 
 extern t_data g_data;
 
+typedef struct s_value
+{
+    int i;
+    int flag;
+    int argc;
+}   t_value;
+
 typedef struct
 {
     int in_quotes;
     char quote_char;
-    char buffer[1024];
+    char buffer[100001];
     bool status;
+    const char *start;
+    int expandit;
+    int double_quotes;
+    int flag;
+    char *expanded_value;
     int buffer_index;
     t_env_node *env;
 } QuoteWordParserState;
 
 /********************Dubag**************************/
 void print_command_structure(Command *cmd) ;
-
+void handle_heredoc(t_data *data, Redirection *redir);
 
 void handle_word(Token *tokens, int *i, Command **current, int *argc);
 void add_command_to_list(Command **head, Command *current);
@@ -133,6 +142,7 @@ void handle_v2(const char **p, char *special, TokenType *type);
 void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens, QuoteWordParserState *state);
 int check_syntaxe(Token *tokens, int nb_tokens);
 int ft_size(char **argv);
+char *expand_variable(const char *start, int length, t_env_node *env);
 
 /**********************redirection_parisng***********************/
 void add_token(Token *tokens, int *num_tokens, TokenType type, char *value);
