@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/04 06:09:58 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/05 21:59:08 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ int is_token(const char *p)
 {
 	char *start;
 	start = (char *)p;
-	while(ft_isspace(*start))
+	while(*start && (ft_isspace(*start)||  *start != '\'' || *start != '"'))
 		start++;
 	if(*start == '\0' || *start == '|')
 		return 1;

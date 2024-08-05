@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/04 05:54:39 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/05 19:27:55 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	next_type(Redirection **redir, Command **current)
 		|| (*redir)->type == TOKEN_APPEND_OUT
 		|| (*redir)->type == TOKEN_REDIRECT_OUT)
 		add_redirection(&(*current)->redirection, *redir);
-	else if ((*redir)->type == TOKEN_HERE_DOC)
+	else if ((*redir)->type == TOKEN_HERE_DOC ||(*redir)->type == TOKEN_HERE_DOC_NO)
 		add_redirection(&(*current)->heredoc, *redir);
 }
 

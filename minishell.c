@@ -12,11 +12,11 @@
 
 #include "minishell.h"
 
-t_data	g_data;
+t_data g_data;
 
-void	free_split(char **arr)
+void free_split(char **arr)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	if (arr != NULL)
@@ -30,17 +30,17 @@ void	free_split(char **arr)
 	}
 }
 
-void	print_redirection(Redirection *redir)
+void print_redirection(Redirection *redir)
 {
 	while (redir)
 	{
 		printf("  Redirection: Type=%d, Filename=%s\n", redir->type,
-			redir->filename);
+			   redir->filename);
 		redir = redir->next;
 	}
 }
 
-void	print_command_structure(Command *cmd)
+void print_command_structure(Command *cmd)
 {
 	while (cmd)
 	{
@@ -56,11 +56,12 @@ void	print_command_structure(Command *cmd)
 		printf("  fdin: %d\n", cmd->fdin);
 		printf("  fdout: %d\n", cmd->fdout);
 		printf("  redir_erros: %d\n", cmd->redir_erros);
-		// // Print heredoc redirections
-		// if (cmd->heredoc) {
-		//     printf("Heredoc redirections:\n");
-		//     print_redirection(cmd->heredoc);
-		// }
+		// Print heredoc redirections
+		if (cmd->heredoc)
+		{
+			printf("Heredoc redirections:\n");
+			print_redirection(cmd->heredoc);
+		}
 		// Print other redirections
 		if (cmd->redirection)
 		{
@@ -73,9 +74,9 @@ void	print_command_structure(Command *cmd)
 	}
 }
 
-int	check_parse(Redirection *redir)
+int check_parse(Redirection *redir)
 {
-	Redirection	*temp;
+	Redirection *temp;
 
 	temp = redir;
 	while (temp)
@@ -84,20 +85,20 @@ int	check_parse(Redirection *redir)
 			return (1);
 		else if (!ft_strcmp(temp->filename, "#"))
 			return (ft_putstr_fd("syntax error near unexpected token `newline'\n",
-					2), 1);
+								 2),
+					1);
 		temp = temp->next;
 	}
 	return (0);
 }
-
-int	main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp)
 {
-	Token	tokens[MAX_TOKENS];
-	Command	*cmd;
-	t_data	*data;
-	char	*line;
-	int		nb_token;
-	Command	*temp;
+	Token tokens[MAX_TOKENS];
+	Command *cmd;
+	t_data *data;
+	char *line;
+	int nb_token;
+	Command *temp;
 
 	(void)argc;
 	(void)argv;
@@ -105,20 +106,19 @@ int	main(int argc, char **argv, char **envp)
 	data->env_list = create_env_list(envp);
 	while (1)
 	{
-		signal(SIGINT, handle_sigint);
-		signal(SIGQUIT, SIG_IGN);
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
 		line = readline("\033[32mminishell> \033[0m");
 		if (!line)
-			break ;
+			break;
 		if (strlen(line) > 0)
 			add_history(line);
 		signal(SIGINT, SIG_IGN);
 		nb_token = 0;
-		if (lex(line, tokens, &nb_token, data->env_list)
-			|| (check_syntaxe(tokens, nb_token)))
+		if (lex(line, tokens, &nb_token, data->env_list) || (check_syntaxe(tokens, nb_token)))
 		{
 			free(line);
-			continue ;
+			continue;
 		}
 		cmd = parse(tokens);
 		if (cmd && check_parse(cmd->redirection) == 1)
@@ -131,7 +131,7 @@ int	main(int argc, char **argv, char **envp)
 				cmd = temp;
 			}
 			else
-				continue ;
+				continue;
 		}
 		if (cmd)
 		{

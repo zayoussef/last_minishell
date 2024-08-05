@@ -6,24 +6,31 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/04 19:52:01 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/05 23:57:28 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-char *remove_single_quotes(const char *str)
+void remove_quotes(char *str)
 {
-    char *result = malloc(strlen(str) + 1);
-    char *dst = result;
-    while (*str)
+    int i;
+    int j;
+
+    if (!str)
+        return;
+    i = 0;
+    j = 0;
+    while (str[i])
     {
-        if (*str != '\'')
-            *dst++ = *str;
-        str++;
+        if (str[i] != '\'' && str[i] != '"')
+        {
+            str[j] = str[i];
+            j++;
+        }
+        i++;
     }
-    *dst = '\0';
-    return result;
+    str[j] = '\0';
 }
 
 void find_when_start(char *str, t_data *data, char **result)
@@ -65,7 +72,6 @@ void find_when_start(char *str, t_data *data, char **result)
     *result = temp_result;
 }
 
-// Function to check the limit of here-docs
 void check_limit_her_doc(Redirection *redir)
 {
     Redirection *tmp_redir = redir;
@@ -73,7 +79,7 @@ void check_limit_her_doc(Redirection *redir)
 
     while (tmp_redir)
     {
-        if (tmp_redir->type == TOKEN_HERE_DOC)
+        if (tmp_redir->type == TOKEN_HERE_DOC || tmp_redir->type == TOKEN_HERE_DOC_NO)
             counter++;
         tmp_redir = tmp_redir->next;
     }
@@ -107,11 +113,13 @@ void handle_heredoc(t_data *data, Redirection *redir)
     if (data->pid == 0)
     {
         close(pipe_fd[0]);
+        remove_quotes(redir->filename);
         while (1)
         {
             line = readline("> ");
-            if (!line)
+            if (!line || (redir->filename[0] == '\0' && line[0] == '\0'))
             {
+                free(line);
                 close(pipe_fd[1]);
                 exit(0);
             }
@@ -143,3 +151,29 @@ void handle_heredoc(t_data *data, Redirection *redir)
         waitpid(data->pid, NULL, 0);
     }
 }
+/*
+minishell> << """ll"cat
+Command:
+File descriptors:
+  fdin: 0
+  fdout: 1
+  redir_erros: 0
+Heredoc redirections:
+  Redirection: Type=10, Filename=""
+in this case should take as limetir llcat;
+>
+minishell> << """ll" cat
+Command: cat
+File descriptors:
+  fdin: 0
+  fdout: 1
+  redir_erros: 0
+Heredoc redirections:
+  Redirection: Type=10, Filename=""
+  in this case should take as limetir ll;
+
+>
+minishell>
+
+and signal makhawerine need fix them 
+/*/

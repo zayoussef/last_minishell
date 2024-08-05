@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/05 05:16:21 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/05 19:26:04 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ void redirection_in_out(t_data *data, Command *cmd)
 			if (data->cmd->redir_erros == -1)
 				return;
 		}
-		if (redir->type != TOKEN_HERE_DOC)
+		if (redir->type != TOKEN_HERE_DOC || redir->type != TOKEN_HERE_DOC_NO)
 		{
 			open_file(data, cmd, redir);
 			if (data->cmd->redir_erros == -1)
