@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/05 00:36:21 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/05 07:09:00 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,11 @@ void handle_child_process(t_data *data, int pipe_fd[2])
     if (pipe_fd[0] >= 3)
         close(pipe_fd[0]);
     ft_dup_out(data, 1);
-
+	if (data->cmd->dup == 1)
+	{
+		data->cmd->dup = 0;
+		exit(1);
+	}
     if (check_is_builtin(*data))
         execute_builtin(data);
     else

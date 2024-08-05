@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/02 19:59:58 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/05 04:13:16 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	fill_cmd(t_data *data)
 		curr_cmd->redir_erros = 0;
 		curr_cmd->fdin = 0;
 		curr_cmd->fdout = 1;
+		curr_cmd->dup = 0;
 		curr_cmd = curr_cmd->next;
 	}
 }

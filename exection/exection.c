@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/05 00:56:57 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/05 05:14:02 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,14 +68,13 @@ void check_invalid_redirections(t_data *data)
         redir = current_cmd->redirection;
         while (redir != NULL)
         {
-            if (!ft_strcmp(redir->filename, "\"\"") || !ft_strcmp(redir->filename, "\'\'"))
+            if (!ft_strcmp(redir->filename, "\"\"") || !ft_strcmp(redir->filename, "\'\'") 
+                || ((redir->type == TOKEN_REDIRECT_IN) && access(redir->filename, R_OK) == -1))
             {
                 ft_putstr_fd("minishell: ", 2);
-                if (current_cmd->argv[0])
-                    ft_putstr_fd(current_cmd->argv[0], 2);
+                ft_putstr_fd(current_cmd->argv[0], 2);
                 ft_putstr_fd(": No such file or directory\n", 2);
-                data->exit_status = 1;
-                current_cmd->redir_erros = -1;
+                data->cmd->dup = 1;
                 break;
             }
             redir = redir->next;
@@ -90,18 +89,9 @@ void execution(t_data *data)
 
     status = 0;
     fill_cmd(data);
-
     check_invalid_redirections(data);
-    // Skip commands with redirection errors
-    while (data->cmd && data->cmd->redir_erros == -1)
-        data->cmd = data->cmd->next;
-    if (!data->cmd)
-        return;
-
-    // Open and check redirections
-    open_check_redirections(data);
-
-    // Skip commands with redirection errors
+    if (data->cmd->dup != 1)
+        open_check_redirections(data);
     while (data->cmd && data->cmd->redir_erros == -1)
         data->cmd = data->cmd->next;
     if (!data->cmd)

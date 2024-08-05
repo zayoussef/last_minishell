@@ -83,7 +83,8 @@ typedef struct Command
     char **argv;              // Arguments array
     int fdin;                 //
     int fdout;                //
-    int redir_erros;          //
+    int redir_erros;  
+        int dup;        //
     struct Command *next;     // Pointer to next command
 } Command;
 
@@ -99,6 +100,7 @@ typedef struct s_data
     int size_cmds;
     int exit_status;
     int is_pipeline;
+
 } t_data;
 
 extern t_data g_data;
@@ -196,7 +198,6 @@ int check_number(char *s);
 int check_n(char *str);
 int check_is_builtin(t_data data);
 void init_execution(t_data *data, int *status);
-void run_execution(t_data *data);
 void singel_cmd(t_data *data, int *status);
 void multiple_cmd(t_data *data, int *status);
 void handle_sigint(int sig);
