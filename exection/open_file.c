@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/04 06:32:34 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/05 00:57:43 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,7 @@ void open_file(t_data *data, Command *cmd, Redirection *redir)
 
 	fd = -1;
 	if (!ft_strcmp(redir->filename, "\"\"") || !ft_strcmp(redir->filename, "\'\'"))
-	{
-		ft_putstr_fd("minishell: : No such file or directory \n", 2);
-		data->exit_status = 1;
-		cmd->redir_erros = -1;
 		return ;
-	}
 	if (redir->type == TOKEN_REDIRECT_IN)
 		fd = open(redir->filename, O_RDONLY);
 	else if (redir->type == TOKEN_REDIRECT_OUT)
@@ -113,12 +108,12 @@ void redirection_in_out(t_data *data, Command *cmd)
 
 void open_check_redirections(t_data *data)
 {
-	Command *current_cmd;
+    Command *current_cmd;
 
-	current_cmd = data->cmd;
-	while (current_cmd != NULL)
-	{
-		redirection_in_out(data, current_cmd);
-		current_cmd = current_cmd->next;
-	}
+    current_cmd = data->cmd;
+    while (current_cmd != NULL)
+    {
+        redirection_in_out(data, current_cmd);
+        current_cmd = current_cmd->next;
+    }
 }

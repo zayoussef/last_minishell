@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/04 07:01:00 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/04 19:52:01 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,6 @@ void handle_heredoc(t_data *data, Redirection *redir)
 {
     char *line;
     char *expanded_line;
-    // char *new_line;
     int pipe_fd[2];
 
     if (pipe(pipe_fd) == -1)
@@ -116,22 +115,14 @@ void handle_heredoc(t_data *data, Redirection *redir)
                 close(pipe_fd[1]);
                 exit(0);
             }
-            dprintf(2, "----- is : %s\n", line);
-            // line = remove_single_quotes(redir->filename);
-            dprintf(2, "is : %s\n", line);
-            char *expanded_delimiter;
-            find_when_start(line, data, &expanded_delimiter);
-            if (ft_strcmp(line, expanded_delimiter) == 0)
+            if (ft_strcmp(line, redir->filename) == 0)
             {
                 free(line);
-                // free(new_line);
-                free(expanded_delimiter);
                 close(pipe_fd[1]);
                 exit(0);
             }
             if (redir->type == TOKEN_HERE_DOC)
             {
-                // Handle unquoted delimiters (variable expansion)
                 find_when_start(line, data, &expanded_line);
                 write(pipe_fd[1], expanded_line, strlen(expanded_line));
                 write(pipe_fd[1], "\n", 1);
@@ -139,13 +130,10 @@ void handle_heredoc(t_data *data, Redirection *redir)
             }
             else
             {
-                // Handle quoted delimiters (no variable expansion)
                 write(pipe_fd[1], line, strlen(line));
                 write(pipe_fd[1], "\n", 1);
             }
             free(line);
-            // free(new_line);
-            free(expanded_delimiter);
         }
     }
     else

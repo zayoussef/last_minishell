@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/03 22:15:55 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/04 23:30:29 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ void	run_execution(t_data *data)
 	char		*exec_path;
 	struct stat	path_stat;
 
+	if (!data->cmd->argv[0])
+        return ;
 	data->env = list_to_char(data->env_list);
 	exec_path = find_path(data->cmd->argv[0], data->env);
 	if (!exec_path)
