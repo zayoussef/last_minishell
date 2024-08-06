@@ -14,7 +14,6 @@
 #define MINISHELL_H
 
 #include <linux/limits.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -75,12 +74,19 @@ typedef struct Redirection
     struct Redirection *next;
 } Redirection;
 
+typedef struct s_cmd
+{
+    char *value;
+    struct s_cmd *next;
+}   t_cmd;
+
 typedef struct Command
 {
-    TokenType *type;
+    TokenType type;
     Redirection *redirection; // Output redirection
     Redirection *heredoc;     // Here-doc redirection
-    char **argv;              // Arguments array
+    //char **argv;              // Arguments array
+    t_cmd *cmd_lst;
     int fdin;                 //
     int fdout;                //
     int redir_erros;  
@@ -100,7 +106,6 @@ typedef struct s_data
     int size_cmds;
     int exit_status;
     int is_pipeline;
-
 } t_data;
 
 extern t_data g_data;
@@ -109,7 +114,6 @@ typedef struct s_value
 {
     int i;
     int flag;
-    int argc;
 }   t_value;
 
 typedef struct
@@ -127,15 +131,57 @@ typedef struct
     t_env_node *env;
 } QuoteWordParserState;
 
-/********************Dubag**************************/
-void print_command_structure(Command *cmd) ;
-void handle_heredoc(t_data *data, Redirection *redir);
+/************************************************************/
+size_t ft_lst_size(t_cmd *cmd);
+void	add_cmd(t_cmd **head,t_cmd *cmmd);
+QuoteWordParserState init_lexer(t_env_node *env);
+void handle_special_characters(const char **p, Token *tokens,
+							   int *num_tokens);
+void handel_q(const char **p, TokenType type, Token *tokens, int *num_tokens);
+void doc_or_in(const char **p, TokenType *type, char *special);
+int check_here_doc_expand(const char **p);
+int splited(Token *tokens, int *num_tokens,
+		   QuoteWordParserState *state);
+int add_to(const char **p, Token *tokens, int *num_tokens,
+		   QuoteWordParserState *state);
+void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens,
+							 QuoteWordParserState *state);
+void hanv3(const char **p, char *special, TokenType *type);
+void handle_v2(const char **p, char *special, TokenType *type);
+int handel_dollar_expand(const char **p, QuoteWordParserState *state);
+int dollar(const char **p, QuoteWordParserState *state);
+int handel_quotes(const char **p, QuoteWordParserState *state);
+int check_space(char *s);
+void ft_buffer_split(Token *tokens, int *nb, const char *str);
+int end_dollar(const char **p, QuoteWordParserState *state);
+int check_ambiguous(Token *tokens, int *num_tokens, QuoteWordParserState *state);
+char *alloc_token(const char *s, int *r, int i);
+void handle_quotes_and_wordsv2(const char **p, QuoteWordParserState **state);
+int is_ambiguous(const char *expanded_value);
+void	process_token(Token *tokens, t_value *value, Command **current,
+Command **head,t_cmd **cmd_head);
+int is_token(const char *p);
 
-void handle_word(Token *tokens, int *i, Command **current, int *argc);
+/*************************************************************/
+bool	is_token_invalid(Token *tokens, int i, int nb_tokens);
+bool	is_double_token_error(Token *tokens, int i);
+bool	is_initial_token_error(Token *tokens, int i);
+bool	is_final_token_error(Token *tokens, int i, int nb_tokens);
+bool	is_invalid_sequence(Token *tokens, int i);
+bool	is_redirection(Token token);
+void	process_operator(Token *tokens, int *i, Command **current,Command **head,t_cmd **cmd_head);
+bool	is_parenthesis(Token *tokens, int i);
+void	handle_syntax_error(void);
+
+/********************Dubag************************************/
+void print_command_structure(Command *cmd) ;
+/************************************************************/
+
+void handle_word(Token *tokens, int *i, Command **current);
 void add_command_to_list(Command **head, Command *current);
 Command *create_command();
 void init_command(Command *cmd);
-Command *parse(Token *tokens);
+Command	*parse(Token *tokens);
 
 /********************lex**************************/
 int lex(const char *input, Token *tokens, int *num_tokens, t_env_node *env);
@@ -144,13 +190,14 @@ void handle_v2(const char **p, char *special, TokenType *type);
 void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens, QuoteWordParserState *state);
 int check_syntaxe(Token *tokens, int nb_tokens);
 int ft_size(char **argv);
-char *expand_variable(const char *start, int length, t_env_node *env);
 
 /**********************redirection_parisng***********************/
 void add_token(Token *tokens, int *num_tokens, TokenType type, char *value);
 void skip_whitespace(const char **p);
 void handle_redirection(Token *tokens, int *i, Command **current);
-void finalize_command(Command **current, int *argc);
+void finalize_command(Command **current);
+char *expand_variable(const char *start, int length, t_env_node *env);
+void handle_heredoc(t_data *data, Redirection *redir);
 
 /********************************free_parsing************************************/
 void free_all_resources(Command *head);
@@ -161,7 +208,6 @@ void free_all_v2(Command *current);
 void redirection_in_out(t_data *data, Command *cmd);
 void open_check_redirections(t_data *data);
 void	add_redirection(Redirection **redir_list, Redirection *redir);
-void check_invalid_redirections(t_data *data);
 
 /********************parsing_tools********************/
 void ft_strncpy(char *dest, const char *src, int n);

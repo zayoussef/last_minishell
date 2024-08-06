@@ -20,30 +20,31 @@ void free_all_v2(Command *current)
             free_redirection(current->heredoc);
 }
 
-void free_all_resources(Command *head)
- {
-    Command *current;
-    Command *next;
-    current = head;
-    int i;
-    if (head == NULL)
-        return;
-    while (current != NULL) {
-        next = current->next;
-        if (current->argv != NULL) {
-            i = 0;
-            while (current->argv[i] != NULL) 
-            {
-                if (current->argv[i] != NULL)
-                    free(current->argv[i]);
-                i++;
-            }
-            if (current->argv != NULL)
-                free(current->argv);
-        }
-        free_all_v2(current);
-        if (current != NULL)
-            free(current);
-        current = next;
-    }
-}
+// void free_all_resources(Command *head)
+//  {
+//     Command *current;
+//     Command *next;
+//     current = head;
+//     int i;
+//     if (head == NULL)
+//         return;
+//     while (current != NULL) {
+//         next = current->next;
+//         if (current->argv != NULL) 
+//         {
+//             i = 0;
+//             while (current->argv[i] != NULL) 
+//             {
+//                 if (current->argv[i] != NULL)
+//                     free(current->argv[i]);
+//                 i++;
+//             }
+//             if (current->argv != NULL)
+//                 free(current->argv);
+//         }
+//         free_all_v2(current);
+//         if (current != NULL)
+//             free(current);
+//         current = next;
+//     }
+// }

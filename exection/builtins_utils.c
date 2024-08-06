@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/16 13:35:22 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/06 20:06:07 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	check_is_builtin(t_data data)
 	int		i;
 
 	builtins_str = "exit env pwd cd export unset echo";
-	if (data.cmd == NULL || data.cmd->argv == NULL || data.cmd->argv[0] == NULL)
+	if (data.cmd == NULL || data.av == NULL || data.av[0] == NULL)
 		return (0);
 	builtins = ft_split(builtins_str, ' ');
 	if (!builtins)
@@ -27,7 +27,7 @@ int	check_is_builtin(t_data data)
 	i = 0;
 	while (builtins[i])
 	{
-		if (ft_strcmp(data.cmd->argv[0], builtins[i]) == 0)
+		if (ft_strcmp(data.av[0], builtins[i]) == 0)
 		{
 			while (builtins[i])
 			{
@@ -43,19 +43,19 @@ int	check_is_builtin(t_data data)
 
 int	execute_builtin(t_data *data)
 {
-	if (!ft_strcmp(data->cmd->argv[0], "exit"))
-		build_exit(data->cmd->argv);
-	else if (!ft_strcmp(data->cmd->argv[0], "env"))
+	if (!ft_strcmp(data->av[0], "exit"))
+		build_exit(data->av);
+	else if (!ft_strcmp(data->av[0], "env"))
 		build_env(data);
-	else if (!ft_strcmp(data->cmd->argv[0], "pwd"))
+	else if (!ft_strcmp(data->av[0], "pwd"))
 		build_pwd(data);
-	else if (!ft_strcmp(data->cmd->argv[0], "cd"))
+	else if (!ft_strcmp(data->av[0], "cd"))
 		build_cd(data);
-	else if (!ft_strcmp(data->cmd->argv[0], "export"))
+	else if (!ft_strcmp(data->av[0], "export"))
 		build_export(data);
-	else if (!ft_strcmp(data->cmd->argv[0], "unset"))
+	else if (!ft_strcmp(data->av[0], "unset"))
 		build_unset(data);
-	else if (!ft_strcmp(data->cmd->argv[0], "echo"))
+	else if (!ft_strcmp(data->av[0], "echo"))
 		build_echo(data);
 	return (data->exit_status);
 }

@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/02 19:06:01 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/06 20:00:30 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,10 +66,10 @@ void	build_echo(t_data *data)
 	int	fd;
 
 	fd = data->cmd->fdout;
-	if (data->cmd->argv[1] == NULL)
+	if (data->av[1] == NULL)
 		ft_putstr_fd("\n", fd);
-	else if (data->cmd->argv[1][0] == '-')
-		check_option(data->cmd->argv, fd);
+	else if (data->av[1][0] == '-')
+		check_option(data->av, fd);
 	else
-		print_av(data->cmd->argv + 1, 1, fd);
+		print_av(data->av + 1, 1, fd);
 }

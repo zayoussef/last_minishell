@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 21:36:21 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/03 21:45:59 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/06 20:05:11 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,15 +121,14 @@ bool	is_operator(Token token)
 		|| token.type == TOKEN_OR;
 }
 
-void	process_operator(Token *tokens, int *i, Command **current, int *argc,
-		Command **head)
+void	process_operator(Token *tokens, int *i, Command **current,Command **head,t_cmd **cmd_head)
 {
-	finalize_command(current, argc);
+	add_cmd(&(*current)->cmd_lst,*cmd_head);
 	add_command_to_list(head, *current);
 	*current = create_command();
 	if (!*current)
 		return ;
-	(*current)->type = &tokens[*i].type;
+	(*current)->type = tokens[*i].type;
 }
 
 bool	is_redirection(Token token)
@@ -152,16 +151,22 @@ void	handle_syntax_error(void)
 }
 
 void	process_token(Token *tokens, t_value *value, Command **current,
-		Command **head)
+		Command **head,t_cmd **cmd_head)
 {
 	if (tokens[value->i].type == TOKEN_WORD)
-		handle_word(tokens, &value->i, current, &value->argc);
+	{
+		handle_word(tokens, &value->i, current);
+	}
 	else if (is_operator(tokens[value->i]))
-		process_operator(tokens, &value->i, current, &value->argc, head);
-	else if (is_redirection(tokens[value->i]))
+		process_operator(tokens, &value->i, current, head,cmd_head);
+	else if (is_redirection(tokens[value->i]) && tokens[value->i + 1].type != TOKEN_AMBIGUOUS)
 	{
 		handle_redirection(tokens, &value->i, current);
 		value->flag++;
+	}
+	else if (is_redirection(tokens[value->i]) && tokens[value->i + 1].type == TOKEN_AMBIGUOUS)
+	{
+		(*current)->type = TOKEN_AMBIGUOUS;
 	}
 	else if (is_parenthesis(tokens, value->i))
 		value->flag++;
@@ -173,23 +178,24 @@ void	process_token(Token *tokens, t_value *value, Command **current,
 Command	*parse(Token *tokens)
 {
 	Command	*head;
+	t_cmd *cmd_head;
 	Command	*current;
 	t_value	value;
 
 	value.flag = 0;
 	value.i = 0;
-	value.argc = 0;
 	head = NULL;
+	cmd_head = NULL;
 	current = create_command();
 	if (!current)
 		return NULL;
 	while (tokens[value.i].type != TOKEN_END)
 	{
-		process_token(tokens, &value, &current, &head);
+		process_token(tokens, &value, &current, &head,&cmd_head);
 	}
-	if (current && (value.argc > 0 || value.flag > 0))
+	if (current && (ft_lst_size(current->cmd_lst) > 0|| value.flag > 0))
 	{
-		finalize_command(&current, &value.argc);
+		add_cmd(&current->cmd_lst,cmd_head);	
 		add_command_to_list(&head, current);
 	}
 	return head;

@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/05 23:07:14 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/06 20:06:30 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void check_invalid_redirections(t_data *data)
             if (!ft_strcmp(redir->filename, "\"\"") || !ft_strcmp(redir->filename, "\'\'") || ((redir->type == TOKEN_REDIRECT_IN) && access(redir->filename, R_OK) == -1))
             {
                 ft_putstr_fd("minishell: ", 2);
-                ft_putstr_fd(current_cmd->argv[0], 2);
+                ft_putstr_fd(data->av[0], 2);
                 ft_putstr_fd(": No such file or directory\n", 2);
                 data->cmd->dup = 1;
                 break;

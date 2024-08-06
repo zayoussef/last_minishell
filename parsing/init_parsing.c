@@ -1,11 +1,11 @@
 #include "../minishell.h"
 
-void init_command(Command *cmd) 
+void	init_command(Command *cmd)
 {
-    cmd->argv = (char **)malloc(MAX_TOKENS * sizeof(char *));
-    cmd->redirection = NULL;
-    cmd->heredoc = NULL;
-    cmd->next = NULL;
+	cmd->cmd_lst = NULL;
+	cmd->redirection = NULL;
+	cmd->heredoc = NULL;
+	cmd->next = NULL;
 }
 
 Command* create_command() 
@@ -29,12 +29,35 @@ void add_command_to_list(Command **head, Command *current)
     }
 }
 
-void handle_word(Token *tokens, int *i, Command **current, int *argc) 
+void	add_cmd(t_cmd **head,t_cmd *cmmd)
 {
-    if (*current == NULL)
-    {
-        *current = create_command();
-        *argc = 0;
-    }
-    (*current)->argv[(*argc)++] = tokens[*i].value;
+	t_cmd	*last;
+
+	if (*head == NULL)
+		*head = cmmd;
+	else
+	{
+		last = *head;
+		while (last->next != NULL)
+			last = last->next;
+		last->next = cmmd;
+	}
+}
+
+void	handle_word(Token *tokens, int *i, Command **current)
+{
+	t_cmd *new_cmd;
+	new_cmd = malloc(sizeof(t_cmd));
+	if (*current == NULL)
+	{
+		*current = create_command();
+	}
+	if(tokens[*i + 1].type == TOKEN_AMBIGUOUS
+		||tokens[*i + 1].type == TOKEN_HASHTAG)
+	{
+		(*current)->type = tokens[*i + 1].type;
+	}
+	new_cmd->value = tokens[*i].value;
+	new_cmd->next = NULL;
+	add_cmd(&(*current)->cmd_lst, new_cmd);
 }

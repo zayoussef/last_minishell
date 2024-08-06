@@ -40,15 +40,16 @@ void print_redirection(Redirection *redir)
 	}
 }
 
-void print_command_structure(Command *cmd)
+void	print_command_structure(Command *cmd)
 {
 	while (cmd)
 	{
 		// Print command arguments
 		printf("Command: ");
-		for (int i = 0; cmd->argv && cmd->argv[i]; i++)
+		while(cmd->cmd_lst)
 		{
-			printf("%s ", cmd->argv[i]);
+			printf("%s\n", cmd->cmd_lst->value);
+			cmd->cmd_lst = cmd->cmd_lst->next;
 		}
 		printf("\n");
 		// Print file descriptors
@@ -57,10 +58,10 @@ void print_command_structure(Command *cmd)
 		printf("  fdout: %d\n", cmd->fdout);
 		printf("  redir_erros: %d\n", cmd->redir_erros);
 		// Print heredoc redirections
-		if (cmd->heredoc)
+		if (cmd->heredoc) 
 		{
-			printf("Heredoc redirections:\n");
-			print_redirection(cmd->heredoc);
+		    printf("Heredoc redirections:\n");
+		    print_redirection(cmd->heredoc);
 		}
 		// Print other redirections
 		if (cmd->redirection)
@@ -90,6 +91,36 @@ int check_parse(Redirection *redir)
 		temp = temp->next;
 	}
 	return (0);
+}
+
+size_t ft_lst_size(t_cmd *cmd)
+{
+		size_t len;
+		len = 0;
+		while(cmd)
+		{
+			len++;
+			cmd = cmd->next;
+		}
+	return len;
+}
+
+char **ft_list_to_char(t_cmd *cmmd,int size)
+{
+	char **cmd;
+	int i;
+	i = 0;
+	cmd = (char **)malloc(sizeof(char *) * (size + 1));
+	if(!cmd)
+		return NULL;
+	while(cmmd && i <= size)
+	{
+		cmd[i] = cmmd->value;
+		cmmd = cmmd->next;
+		i++;
+	}
+	cmd[i] = NULL;
+	return cmd;
 }
 int main(int argc, char **argv, char **envp)
 {
@@ -136,14 +167,15 @@ int main(int argc, char **argv, char **envp)
 		if (cmd)
 		{
 			data->cmd = cmd;
-			data->ac = ft_size(cmd->argv);
-			data->av = cmd->argv;
+			data->ac = ft_lst_size(cmd->cmd_lst);
+			data->av = ft_list_to_char(cmd->cmd_lst, data->ac);
 			data->size_cmds = ft_strlnode(data->cmd);
+
 			execution(data);
 			// print_command_structure(cmd);
 			if (line)
 				free(line);
-			free_all_resources(cmd);
+			// free_all_resources(cmd);
 		}
 		// exit_status = data->exit_status;
 		// free_env_list(data->env_list);

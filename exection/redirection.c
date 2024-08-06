@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/05 19:27:55 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/06 20:04:05 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,10 @@ void	handle_redirection(Token *tokens, int *i, Command **current)
 	next_type(&redir, current);
 }
 
-void	finalize_command(Command **current, int *argc)
+void	finalize_command(Command **current)
 {
 	if (*current)
 	{
-		(*current)->argv[*argc] = NULL;
-		*argc = 0;
+		(*current)->cmd_lst->value = NULL;
 	}
 }
