@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/05 07:07:31 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/07 07:13:42 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,8 @@ char	*find_path(char *cmd, char **env)
 	char	*exec_path;
 	int		i;
 
+	if (*cmd == '\0')
+		return NULL;
 	i = 0;
 	if (ft_strchr(cmd, '/'))
 		return (check_cmd(cmd));

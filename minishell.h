@@ -14,6 +14,7 @@
 #define MINISHELL_H
 
 #include <linux/limits.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -87,6 +88,7 @@ typedef struct Command
     Redirection *heredoc;     // Here-doc redirection
     //char **argv;              // Arguments array
     t_cmd *cmd_lst;
+    char **av;
     int fdin;                 //
     int fdout;                //
     int redir_erros;  
@@ -132,6 +134,7 @@ typedef struct
 } QuoteWordParserState;
 
 /************************************************************/
+
 size_t ft_lst_size(t_cmd *cmd);
 void	add_cmd(t_cmd **head,t_cmd *cmmd);
 QuoteWordParserState init_lexer(t_env_node *env);
@@ -172,7 +175,7 @@ bool	is_redirection(Token token);
 void	process_operator(Token *tokens, int *i, Command **current,Command **head,t_cmd **cmd_head);
 bool	is_parenthesis(Token *tokens, int i);
 void	handle_syntax_error(void);
-
+void ft_reset_file(Command *cmd);
 /********************Dubag************************************/
 void print_command_structure(Command *cmd) ;
 /************************************************************/
@@ -247,6 +250,7 @@ void init_execution(t_data *data, int *status);
 void singel_cmd(t_data *data, int *status);
 void multiple_cmd(t_data *data, int *status);
 void handle_sigint(int sig);
+void	herd_sig(int sig);
 t_data *get_global_data(void);
 int ft_strlnode(Command *cmd);
 int count_env_nodes(t_env_node *env_list);

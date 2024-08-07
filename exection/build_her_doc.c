@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/05 23:57:28 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/07 06:40:16 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,14 +113,17 @@ void handle_heredoc(t_data *data, Redirection *redir)
     if (data->pid == 0)
     {
         close(pipe_fd[0]);
+        signal(SIGINT, herd_sig);
         remove_quotes(redir->filename);
         while (1)
         {
             line = readline("> ");
-            if (!line || (redir->filename[0] == '\0' && line[0] == '\0'))
+            if (!line)
             {
-                free(line);
+                ft_putstr_fd("minishell: ", 2);
+                ft_putstr_fd("warning: here-document delimited by end-of-file (wanted `')\n", 2);
                 close(pipe_fd[1]);
+                free(line);
                 exit(0);
             }
             if (ft_strcmp(line, redir->filename) == 0)
@@ -175,5 +178,5 @@ Heredoc redirections:
 >
 minishell>
 
-and signal makhawerine need fix them 
+and signal makhawerine need fix them
 /*/

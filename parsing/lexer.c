@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/05 21:59:08 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/07 07:12:55 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,6 @@ void handle_quotes_and_wordsv2(const char **p, QuoteWordParserState **state)
 			(*state)->in_quotes = 0;
 			(*state)->quote_char = '\0';
 		}
-		else
-			(*state)->buffer[(*state)->buffer_index++] = **p;
 	}
 	else
 	{
@@ -120,9 +118,9 @@ int is_token(const char *p)
 {
 	char *start;
 	start = (char *)p;
-	while(*start && (ft_isspace(*start)||  *start != '\'' || *start != '"'))
+	while (*start && (ft_isspace(*start) || *start != '\'' || *start != '"'))
 		start++;
-	if(*start == '\0' || *start == '|')
+	if (*start == '\0' || *start == '|')
 		return 1;
 	return 0;
 }
@@ -134,15 +132,6 @@ int handel_quotes(const char **p, QuoteWordParserState *state)
 		(*p) += 2;
 		return (1);
 	}
-	else if(((**p == '"' && *(*p + 1) == '"')||
-	 (**p == '\'' && *(*p + 1) == '\'')) && is_token((*p + 2)))
-	 {
-		state->buffer[state->buffer_index++] = **p;
-		state->buffer[state->buffer_index++] = *(*p + 1);
-		state->buffer[state->buffer_index++] = '\0';
-		(*p)+= 2;
-		return 1;
-	 }
 	else if ((**p == '"' || **p == '\'') && (state->in_quotes == 0 || **p == state->quote_char))
 	{
 		if (**p == '"')
@@ -249,11 +238,13 @@ void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens,
 							 QuoteWordParserState *state)
 {
 	state->buffer_index = 0;
-	while (**p != '\0' && (state->in_quotes || (!ft_isspace(**p) && **p != '|' && **p != '<' && **p != '>' && **p != '&' && **p != '(' && **p != ')')))
+	while (ft_isspace(**p) && !state->in_quotes)
+		(*p)++;
+    while (**p != '\0' && (state->in_quotes || (!ft_isspace(**p) && !ft_strchr("<>|&()",**p))))
 	{
 		if (handel_quotes(p, state) == 1)
 			continue;
-		else if (**p == '$' && *(*p + 1) != '\0' && state->quote_char != '\'')
+		if (**p == '$' && *(*p + 1) != '\0' && state->quote_char != '\'')
 		{
 			(*p)++;
 			state->start = *p;
@@ -264,12 +255,12 @@ void handle_quotes_and_words(const char **p, Token *tokens, int *num_tokens,
 		}
 		else
 			state->buffer[state->buffer_index++] = *(*p)++;
-	} 
+	}
 	if (state->buffer_index == 0 && state->in_quotes)
-        state->buffer[0] = '\0';
+	    state->buffer[0] = '\0';
 	state->buffer[state->buffer_index] = '\0';
-	
-	if (state->buffer_index > 0 && state->flag == 0)
+
+	if (state->buffer_index >= 0 && state->flag == 0)
 		// Only add token if buffer is not empty
 		add_token(tokens, num_tokens, TOKEN_WORD, state->buffer);
 }
@@ -316,9 +307,9 @@ int check_here_doc_expand(const char **p)
 {
 	const char *str;
 	str = (*p + 2);
-	while(ft_isspace(*str))
+	while (ft_isspace(*str))
 		str++;
-	if((*str) == '"' || (*str) == '\'')
+	if ((*str) == '"' || (*str) == '\'')
 		return 1;
 	return 0;
 }
@@ -329,8 +320,8 @@ void doc_or_in(const char **p, TokenType *type, char *special)
 		special[0] = '<';
 		special[1] = '<';
 		special[2] = '\0';
-		
-		if(check_here_doc_expand(p))
+
+		if (check_here_doc_expand(p))
 			*type = TOKEN_HERE_DOC_NO;
 		else
 			*type = TOKEN_HERE_DOC;
@@ -386,7 +377,7 @@ void handle_special_characters(const char **p, Token *tokens,
 			hanv3(p, special, &type);
 		else if (**p == '<')
 			doc_or_in(p, &type, special);
-		else if(**p == '>')
+		else if (**p == '>')
 			handle_v2(p, special, &type);
 		add_token(tokens, num_tokens, type, special);
 		(*p)++;

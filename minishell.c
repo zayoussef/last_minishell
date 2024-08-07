@@ -122,6 +122,12 @@ char **ft_list_to_char(t_cmd *cmmd,int size)
 	cmd[i] = NULL;
 	return cmd;
 }
+void ft_reset_file(Command *cmd)
+{
+	dup2(cmd->fdin, 0);
+	dup2(cmd->fdout, 1);
+}
+
 int main(int argc, char **argv, char **envp)
 {
 	Token tokens[MAX_TOKENS];
@@ -137,7 +143,7 @@ int main(int argc, char **argv, char **envp)
 	data->env_list = create_env_list(envp);
 	while (1)
 	{
-		signal(SIGINT, SIG_DFL);
+		signal(SIGINT, handle_sigint);
 		signal(SIGQUIT, SIG_DFL);
 		line = readline("\033[32mminishell> \033[0m");
 		if (!line)
@@ -166,11 +172,11 @@ int main(int argc, char **argv, char **envp)
 		}
 		if (cmd)
 		{
+			/*TODO : lola cmd khaseha av deyalha*/
 			data->cmd = cmd;
 			data->ac = ft_lst_size(cmd->cmd_lst);
-			data->av = ft_list_to_char(cmd->cmd_lst, data->ac);
+			data->av = ft_list_to_char(cmd->cmd_lst, data->ac - 1);
 			data->size_cmds = ft_strlnode(data->cmd);
-
 			execution(data);
 			// print_command_structure(cmd);
 			if (line)
