@@ -27,12 +27,12 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-// Constants
+/******  Constants ********/
 # define PWD_ERROR_MSG "minishell: pwd: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory"
 # define HER_DOC "warning: here-document delimited by end-of-file (wanted `')\n"
 # define MAX_TOKENS 100000
 
-// Enums
+/********** Enums *******/
 typedef enum
 {
 	TOKEN_WORD,
@@ -55,7 +55,7 @@ typedef enum
 	TOKEN_END
 }						TokenType;
 
-// Structures
+/****************  Structures **********/
 typedef struct s_env_node
 {
 	char				*name;
@@ -134,7 +134,7 @@ typedef struct
 	t_env_node			*env;
 }						QuoteWordParserState;
 
-// Function Prototypes
+/********** Function Prototypes ********************/
 
 /******************** Utility Functions ********************/
 void					ft_strncpy(char *dest, const char *src, int n);
