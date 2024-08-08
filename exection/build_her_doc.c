@@ -95,7 +95,10 @@ void handle_heredoc(t_data *data, Redirection *redir)
     char *line;
     char *expanded_line;
     int pipe_fd[2];
+    int status;
 
+    if (data->her_erros)
+            return ;
     if (pipe(pipe_fd) == -1)
     {
         perror("pipe");
@@ -151,7 +154,9 @@ void handle_heredoc(t_data *data, Redirection *redir)
     {
         close(pipe_fd[1]);
         data->cmd->fdin = pipe_fd[0];
-        waitpid(data->pid, NULL, 0);
+        waitpid(data->pid, &status, 0);
+        if (WIFEXITED(status))
+            data->her_errors = 1;
     }
 }
 /*
