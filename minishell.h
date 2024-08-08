@@ -108,6 +108,7 @@ typedef struct s_data
     int size_cmds;
     int exit_status;
     int is_pipeline;
+	int her_erros;
 } t_data;
 
 extern t_data g_data;
