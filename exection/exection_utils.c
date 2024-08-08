@@ -62,7 +62,7 @@ char	*find_path(char *cmd, char **env)
 	char	*exec_path;
 	int		i;
 
-	if (*cmd == '\0')
+	if (*cmd == '\0' || !env)
 		return NULL;
 	i = 0;
 	if (ft_strchr(cmd, '/'))
@@ -73,7 +73,11 @@ char	*find_path(char *cmd, char **env)
 			break ;
 		i++;
 	}
+	if (!env[i])
+		return NULL;
 	path = ft_split(env[i] + 5, ':');
+	if (!path)
+		return NULL;
 	i = 0;
 	while (path[i])
 	{
