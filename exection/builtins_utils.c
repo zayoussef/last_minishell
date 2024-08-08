@@ -19,7 +19,7 @@ int	check_is_builtin(t_data data)
 	int		i;
 
 	builtins_str = "exit env pwd cd export unset echo";
-	if (data.cmd == NULL || data.av == NULL || data.av[0] == NULL)
+	if (data.cmd == NULL || data.cmd->av == NULL || data.cmd->av[0] == NULL)
 		return (0);
 	builtins = ft_split(builtins_str, ' ');
 	if (!builtins)
@@ -27,7 +27,7 @@ int	check_is_builtin(t_data data)
 	i = 0;
 	while (builtins[i])
 	{
-		if (ft_strcmp(data.av[0], builtins[i]) == 0)
+		if (ft_strcmp(data.cmd->av[0], builtins[i]) == 0)
 		{
 			while (builtins[i])
 			{
