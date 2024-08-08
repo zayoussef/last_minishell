@@ -176,6 +176,7 @@ int main(int argc, char **argv, char **envp)
 		{
 			/*TODO : lola cmd khaseha av deyalha*/
 			data->cmd = cmd;
+			data->her_erros = 0;
 			data->ac = ft_lst_size(cmd->cmd_lst);
 			data->cmd->av = cmd->av;
 			data->size_cmds = ft_strlnode(data->cmd);
