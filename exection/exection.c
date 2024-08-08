@@ -116,6 +116,8 @@ void execution(t_data *data)
         }
         current_cmd = current_cmd->next;
     }
+    if (data->her_erros)
+            return ;
     check_invalid_redirections(data);
     if (data->cmd->dup != 1)
         open_check_redirections(data);
