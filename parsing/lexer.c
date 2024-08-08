@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/08 14:53:25 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 23:22:14 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,11 @@ char *expand_variable(const char *start, int length, t_env_node *env)
 	if (value)
 		return (ft_strdup(value));
 	else
-		return (ft_strdup("")); // Return empty string if variable is not found
+		return (ft_strdup(""));
 }
 
 int is_ambiguous(const char *expanded_value)
 {
-	// Check if the expanded value contains spaces or is empty
 	return (ft_strrch_finder((char *)expanded_value, ' ') != NULL || expanded_value[0] == '\0' || !expanded_value);
 }
 

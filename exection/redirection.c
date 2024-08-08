@@ -15,11 +15,11 @@
 void	add_token(Token *tokens, int *num_tokens, TokenType type, char *value)
 {
 	tokens[*num_tokens].type = type;
-    if (value == NULL)
-        tokens[*num_tokens].value = NULL;
-    else
-        tokens[*num_tokens].value = ft_strdup(value);
-    (*num_tokens)++;
+	if (value == NULL)
+		tokens[*num_tokens].value = NULL;
+	else
+		tokens[*num_tokens].value = ft_strdup(value);
+	(*num_tokens)++;
 }
 
 void	skip_whitespace(const char **p)
@@ -34,7 +34,8 @@ void	next_type(Redirection **redir, Command **current)
 		|| (*redir)->type == TOKEN_APPEND_OUT
 		|| (*redir)->type == TOKEN_REDIRECT_OUT)
 		add_redirection(&(*current)->redirection, *redir);
-	else if ((*redir)->type == TOKEN_HERE_DOC ||(*redir)->type == TOKEN_HERE_DOC_NO)
+	else if ((*redir)->type == TOKEN_HERE_DOC
+		|| (*redir)->type == TOKEN_HERE_DOC_NO)
 		add_redirection(&(*current)->heredoc, *redir);
 }
 
