@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/08 15:06:43 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 22:20:58 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,36 +40,46 @@ void ft_dup_out(t_data *data, int i)
 	}
 }
 
+void setup_input(t_data *data)
+{
+    if (data->cmd->fdin >= 3)
+        ft_dup_in(data);
+    else if (data->fd[0] >= 3)
+    {
+        dup2(data->fd[0], STDIN_FILENO);
+        close(data->fd[0]);
+    }
+}
+
+void setup_output(t_data *data, int pipe_fd[2])
+{
+    if (data->cmd->fdout >= 3)
+        ft_dup_out(data, 0);
+    else if (data->cmd->next)
+        dup2(pipe_fd[1], STDOUT_FILENO);
+    if (pipe_fd[1] >= 3)
+        close(pipe_fd[1]);
+    if (pipe_fd[0] >= 3)
+        close(pipe_fd[0]);
+    ft_dup_out(data, 1);
+}
+
 void handle_child_process(t_data *data, int pipe_fd[2])
 {
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
-	if (data->cmd->fdin >= 3)
-		ft_dup_in(data);
-	else if (data->fd[0] >= 3)
-	{
-		dup2(data->fd[0], STDIN_FILENO);
-		close(data->fd[0]);
-	}
-	if (data->cmd->fdout >= 3)
-		ft_dup_out(data, 0);
-	else if (data->cmd->next)
-		dup2(pipe_fd[1], STDOUT_FILENO);
-	if (pipe_fd[1] >= 3)
-		close(pipe_fd[1]);
-	if (pipe_fd[0] >= 3)
-		close(pipe_fd[0]);
-	ft_dup_out(data, 1);
-	if (data->cmd->dup == 1)
-	{
-		data->cmd->dup = 0;
-		exit(1);
-	}
-	if (check_is_builtin(*data))
-		execute_builtin(data);
-	else
-		run_execution(data);
-	exit(data->exit_status);
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+    setup_input(data);
+    setup_output(data, pipe_fd);
+    if (data->cmd->dup == 1)
+    {
+        data->cmd->dup = 0;
+        exit(1);
+    }
+    if (check_is_builtin(*data))
+        execute_builtin(data);
+    else
+        run_execution(data);
+    exit(data->exit_status);
 }
 
 void singel_cmd(t_data *data, int *status)

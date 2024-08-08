@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/08 13:35:51 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 22:23:56 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,36 +74,49 @@ void check_permissions(t_data *data, Command *cmd, TokenType type)
 	}
 }
 
+void handle_redirect_in(t_data *data, Command *cmd, Redirection *redir)
+{
+    if (access(redir->filename, F_OK) == -1)
+    {
+        ft_putstr_fd("minishell: ", 2);
+        ft_putstr_fd(redir->filename, 2);
+        ft_putstr_fd(": No such file or directory\n", 2);
+        data->exit_status = 1;
+        cmd->redir_erros = -1;
+        return ;
+    }
+    check_permissions(data, cmd, redir->type);
+    if (cmd->redir_erros == -1)
+        return ;
+}
+
+void handle_other_redirects(t_data *data, Command *cmd, Redirection *redir)
+{
+    if (redir->type != TOKEN_HERE_DOC && redir->type != TOKEN_HERE_DOC_NO)
+    {
+        open_file(data, cmd, redir);
+        if (cmd->redir_erros == -1)
+            return ;
+    }
+}
+
 void redirection_in_out(t_data *data, Command *cmd)
 {
-	Redirection *redir;
+    Redirection *redir = cmd->redirection;
 
-	redir = cmd->redirection;
-	while (redir != NULL)
-	{
-		if (redir->type == TOKEN_REDIRECT_IN)
-		{
-			if (access(redir->filename, F_OK) == -1)
-			{
-				ft_putstr_fd("minishell: ", 2);
-				ft_putstr_fd(redir->filename, 2);
-				ft_putstr_fd(": No such file or directory +++ - --\n", 2);
-				data->exit_status = 1;
-				cmd->redir_erros = -1;
-				return;
-			}
-			check_permissions(data, cmd, redir->type);
-			if (data->cmd->redir_erros == -1)
-				return;
-		}
-		if (redir->type != TOKEN_HERE_DOC || redir->type != TOKEN_HERE_DOC_NO)
-		{
-			open_file(data, cmd, redir);
-			if (data->cmd->redir_erros == -1)
-				return;
-		}
-		redir = redir->next;
-	}
+    while (redir != NULL)
+    {
+        if (redir->type == TOKEN_REDIRECT_IN)
+        {
+            handle_redirect_in(data, cmd, redir);
+            if (cmd->redir_erros == -1)
+                return ;
+        }
+        handle_other_redirects(data, cmd, redir);
+        if (cmd->redir_erros == -1)
+            return ;
+        redir = redir->next;
+    }
 }
 
 void open_check_redirections(t_data *data)

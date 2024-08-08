@@ -174,7 +174,6 @@ int main(int argc, char **argv, char **envp)
 		}
 		if (cmd)
 		{
-			/*TODO : lola cmd khaseha av deyalha*/
 			data->cmd = cmd;
 			data->her_erros = 0;
 			data->ac = ft_lst_size(cmd->cmd_lst);

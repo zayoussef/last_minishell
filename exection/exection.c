@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/08 14:59:20 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 22:10:42 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,31 +66,56 @@ void init_execution(t_data *data, int *status)
     }
 }
 
+void handle_invalid_redirection(t_data *data, Command *cmd, Redirection *redir)
+{
+    if (!ft_strcmp(redir->filename, "") ||
+        ((redir->type == TOKEN_REDIRECT_IN) && access(redir->filename, R_OK) == -1))
+    {
+        ft_putstr_fd("minishell: ", 2);
+        ft_putstr_fd(": No such file or directory\n", 2);
+        data->exit_status = 1;
+        cmd->dup = 1;
+    }
+}
+
 void check_invalid_redirections(t_data *data)
 {
-    Command *current_cmd;
+    Command *current_cmd = data->cmd;
     Redirection *redir;
 
-    current_cmd = data->cmd;
     while (current_cmd != NULL)
     {
         if (current_cmd->type == TOKEN_AMBIGUOUS)
         {
             ft_putstr_fd("minishell: ambiguous redirect\n", 2);
+            data->exit_status = 1;
             data->cmd->dup = 1;
             return ;
         }
         redir = current_cmd->redirection;
         while (redir != NULL)
         {
-            if (!ft_strcmp(redir->filename, "") || ((redir->type == TOKEN_REDIRECT_IN) && access(redir->filename, R_OK) == -1))
-            {
-                ft_putstr_fd("minishell: ", 2);
-                ft_putstr_fd(data->cmd->av[0], 2);
-                ft_putstr_fd(": No such file or directory\n", 2);
-                data->cmd->dup = 1;
-                break;
-            }
+            handle_invalid_redirection(data, current_cmd, redir);
+            if (current_cmd->dup == 1)
+                break ;
+            redir = redir->next;
+        }
+        current_cmd = current_cmd->next;
+    }
+}
+
+void handle_all_heredocs(t_data *data)
+{
+    Command *current_cmd;
+    Redirection *redir;
+
+    current_cmd = data->cmd;
+    while (current_cmd)
+    {
+        redir = current_cmd->heredoc;
+        while (redir)
+        {
+            handle_heredoc(data, redir);
             redir = redir->next;
         }
         current_cmd = current_cmd->next;
@@ -99,28 +124,16 @@ void check_invalid_redirections(t_data *data)
 
 void execution(t_data *data)
 {
-    int status;
-    Redirection *redir;
+    int status = 0;
 
-    status = 0;
     fill_cmd(data);
-    // print_command_structure(data->cmd);
-    Command *current_cmd = data->cmd;
-    while (current_cmd != NULL)
-    {
-        redir = current_cmd->heredoc;
-        while (redir != NULL)
-        {
-            handle_heredoc(data, redir);
-            redir = redir->next;
-        }
-        current_cmd = current_cmd->next;
-    }
+    handle_all_heredocs(data);
     if (data->her_erros)
-            return ;
+        return;
     check_invalid_redirections(data);
-    if (data->cmd->dup != 1)
-        open_check_redirections(data);
+    if (data->cmd && data->cmd->dup != 0)
+        data->cmd = data->cmd->next;
+    open_check_redirections(data);
     while (data->cmd && data->cmd->redir_erros == -1)
         data->cmd = data->cmd->next;
     if (!data->cmd)
