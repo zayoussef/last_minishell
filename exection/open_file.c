@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/07 06:55:29 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 13:35:51 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void redirection_in_out(t_data *data, Command *cmd)
 			{
 				ft_putstr_fd("minishell: ", 2);
 				ft_putstr_fd(redir->filename, 2);
-				ft_putstr_fd(": No such file or directory\n", 2);
+				ft_putstr_fd(": No such file or directory +++ - --\n", 2);
 				data->exit_status = 1;
 				cmd->redir_erros = -1;
 				return;

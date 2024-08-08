@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/03 00:52:05 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 12:18:03 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	print_erros(t_data *data, int fd)
 {
 	ft_putstr_fd("env: ‘", fd);
-	ft_putstr_fd(data->av[1], fd);
+	ft_putstr_fd(data->cmd->av[1], fd);
 	ft_putstr_fd("’: No such file or directory\n", fd);
 	data->exit_status = EXIT_FAILURE;
 }

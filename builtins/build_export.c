@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 18:37:48 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/02 20:05:45 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 12:18:03 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,17 +109,17 @@ void	build_export(t_data *data)
 		print_sorted_env_fd(data->env_list, fd);
 		return ;
 	}
-	while (data->av[i])
+	while (data->cmd->av[i])
 	{
-		if (!is_valid_identifier(data->av[i]))
+		if (!is_valid_identifier(data->cmd->av[i]))
 		{
 			ft_putstr_fd("minishell: export: `", fd);
-			ft_putstr_fd(data->av[i], fd);
+			ft_putstr_fd(data->cmd->av[i], fd);
 			ft_putstr_fd("`: not a valid identifier\n", fd);
 			data->exit_status = EXIT_FAILURE;
 		}
 		else
-			handle_export(&(data->env_list), data->av[i]);
+			handle_export(&(data->env_list), data->cmd->av[i]);
 		i++;
 	}
 	data->exit_status = EXIT_SUCCESS;

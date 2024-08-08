@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/06 20:07:43 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 12:18:03 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,15 +60,15 @@ void	run_execution(t_data *data)
 	char		*exec_path;
 	struct stat	path_stat;
 
-	if (!data->av[0])
+	if (!data->cmd->av[0])
         return ;
 	data->env = list_to_char(data->env_list);
-	exec_path = find_path(data->av[0], data->env);
+	exec_path = find_path(data->cmd->av[0], data->env);
 	if (!exec_path)
-		handle_exec_error(data->av[0]);
+		handle_exec_error(data->cmd->av[0]);
 	if (stat(exec_path, &path_stat) == 0 && S_ISDIR(path_stat.st_mode))
 		handle_is_directory(exec_path);
-	execve(exec_path, data->av, data->env);
+	execve(exec_path, data->cmd->av, data->env);
 	perror("minishell");
 	exit(127);
 }

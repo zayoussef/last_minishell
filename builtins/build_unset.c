@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 18:37:52 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/11 19:02:23 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 12:18:03 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,9 @@ void	build_unset(t_data *data)
 	int	i;
 
 	i = 1;
-	while (data->av[i])
+	while (data->cmd->av[i])
 	{
-		unset_env(data->av[i], &(data->env_list));
+		unset_env(data->cmd->av[i], &(data->env_list));
 		i++;
 	}
 	data->exit_status = 0;

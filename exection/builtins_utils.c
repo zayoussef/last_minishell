@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/06 20:06:07 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 15:04:41 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,19 +43,19 @@ int	check_is_builtin(t_data data)
 
 int	execute_builtin(t_data *data)
 {
-	if (!ft_strcmp(data->av[0], "exit"))
-		build_exit(data->av);
-	else if (!ft_strcmp(data->av[0], "env"))
+	if (!ft_strcmp(data->cmd->av[0], "exit"))
+		build_exit(data->cmd->av);
+	else if (!ft_strcmp(data->cmd->av[0], "env"))
 		build_env(data);
-	else if (!ft_strcmp(data->av[0], "pwd"))
+	else if (!ft_strcmp(data->cmd->av[0], "pwd"))
 		build_pwd(data);
-	else if (!ft_strcmp(data->av[0], "cd"))
+	else if (!ft_strcmp(data->cmd->av[0], "cd"))
 		build_cd(data);
-	else if (!ft_strcmp(data->av[0], "export"))
+	else if (!ft_strcmp(data->cmd->av[0], "export"))
 		build_export(data);
-	else if (!ft_strcmp(data->av[0], "unset"))
+	else if (!ft_strcmp(data->cmd->av[0], "unset"))
 		build_unset(data);
-	else if (!ft_strcmp(data->av[0], "echo"))
+	else if (!ft_strcmp(data->cmd->av[0], "echo"))
 		build_echo(data);
 	return (data->exit_status);
 }

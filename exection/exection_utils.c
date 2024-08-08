@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/07 07:13:42 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 13:29:00 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ char	*check_cmd(char *cmd)
 	if (access(cmd, F_OK) == -1)
 	{
 		ft_putstr_fd(cmd, 2);
-		ft_putstr_fd(": No such file or directory\n", 2);
+		ft_putstr_fd(": No such file or directory ==== \n", 2);
 		exit(127);
 	}
 	else if (access(cmd, X_OK) == -1)

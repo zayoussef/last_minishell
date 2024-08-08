@@ -91,8 +91,8 @@ typedef struct Command
     char **av;
     int fdin;                 //
     int fdout;                //
-    int redir_erros;  
-        int dup;        //
+    int redir_erros;            //
+    int dup;                  //
     struct Command *next;     // Pointer to next command
 } Command;
 
@@ -136,6 +136,7 @@ typedef struct
 /************************************************************/
 
 size_t ft_lst_size(t_cmd *cmd);
+char **ft_list_to_char(t_cmd *cmmd,int size);
 void	add_cmd(t_cmd **head,t_cmd *cmmd);
 QuoteWordParserState init_lexer(t_env_node *env);
 void handle_special_characters(const char **p, Token *tokens,

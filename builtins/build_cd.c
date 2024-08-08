@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 15:03:14 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/03 00:43:16 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 12:18:03 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,11 +125,11 @@ void	build_cd(t_data *data)
 		free(oldcwd);
 		return ;
 	}
-	if (!data->av[1] || !ft_strcmp(data->av[1], "~"))
+	if (!data->cmd->av[1] || !ft_strcmp(data->cmd->av[1], "~"))
 		go_home(data);
-	else if (!ft_strcmp(data->av[1], "-"))
+	else if (!ft_strcmp(data->cmd->av[1], "-"))
 		swap_pwd_oldpwd(data);
 	else
-		change_directory(data, data->av[1]);
+		change_directory(data, data->cmd->av[1]);
 	free(oldcwd);
 }

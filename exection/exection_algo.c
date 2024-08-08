@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/07 07:16:29 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 15:06:43 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,10 +75,7 @@ void handle_child_process(t_data *data, int pipe_fd[2])
 void singel_cmd(t_data *data, int *status)
 {
 	if (check_is_builtin(*data) == 1)
-	{
 		run_builtin(data, status);
-		ft_reset_file(data->cmd);
-	}
 	else
 	{
 		data->pid = fork();
@@ -97,7 +94,6 @@ void singel_cmd(t_data *data, int *status)
 			if (data->cmd->fdout != STDOUT_FILENO)
 				ft_dup_out(data, 0);
 			run_execution(data);
-			ft_reset_file(data->cmd);
 			exit(EXIT_SUCCESS);
 		}
 	}

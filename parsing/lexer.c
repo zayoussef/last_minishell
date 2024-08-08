@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/07 07:12:55 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 14:53:25 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,7 +186,6 @@ int check_ambiguous(Token *tokens, int *num_tokens, QuoteWordParserState *state)
 	{
 		free(state->expanded_value);
 		add_token(tokens, num_tokens, TOKEN_AMBIGUOUS, "?");
-		ft_putstr_fd("minishell: ambiguous redirect\n", 2);
 		return (1);
 	}
 	return (0);

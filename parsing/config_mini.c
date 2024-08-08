@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 17:31:07 by yozainan          #+#    #+#             */
-/*   Updated: 2024/07/13 14:45:30 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/08 12:18:03 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void ft_init_minishell(int ac, char **av, char **env, t_data *data)
 {
    (void)env;
     data->ac = ac;
-    data->av = av;
+    data->cmd->av = av;
     data->exit_status = 0;
 }
 

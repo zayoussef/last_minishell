@@ -40,14 +40,19 @@ void print_redirection(Redirection *redir)
 	}
 }
 
-void	print_command_structure(Command *cmd)
+void print_command_structure(Command *cmd)
 {
 	while (cmd)
 	{
 		// Print command arguments
 		printf("Command: ");
-		while(cmd->cmd_lst)
+
+		while (cmd->cmd_lst)
 		{
+			if (cmd->type == TOKEN_AMBIGUOUS)
+				printf("NOT EXECUTE THIS COMMAND\n");
+			else if (cmd->type == TOKEN_HASHTAG)
+				printf("NOT   ### EXECUTE THIS COMMAND\n");
 			printf("%s\n", cmd->cmd_lst->value);
 			cmd->cmd_lst = cmd->cmd_lst->next;
 		}
@@ -58,10 +63,10 @@ void	print_command_structure(Command *cmd)
 		printf("  fdout: %d\n", cmd->fdout);
 		printf("  redir_erros: %d\n", cmd->redir_erros);
 		// Print heredoc redirections
-		if (cmd->heredoc) 
+		if (cmd->heredoc)
 		{
-		    printf("Heredoc redirections:\n");
-		    print_redirection(cmd->heredoc);
+			printf("Heredoc redirections:\n");
+			print_redirection(cmd->heredoc);
 		}
 		// Print other redirections
 		if (cmd->redirection)
@@ -82,9 +87,7 @@ int check_parse(Redirection *redir)
 	temp = redir;
 	while (temp)
 	{
-		if (!ft_strcmp(temp->filename, "?"))
-			return (1);
-		else if (!ft_strcmp(temp->filename, "#"))
+		if (!ft_strcmp(temp->filename, "#"))
 			return (ft_putstr_fd("syntax error near unexpected token `newline'\n",
 								 2),
 					1);
@@ -95,25 +98,25 @@ int check_parse(Redirection *redir)
 
 size_t ft_lst_size(t_cmd *cmd)
 {
-		size_t len;
-		len = 0;
-		while(cmd)
-		{
-			len++;
-			cmd = cmd->next;
-		}
+	size_t len;
+	len = 0;
+	while (cmd)
+	{
+		len++;
+		cmd = cmd->next;
+	}
 	return len;
 }
 
-char **ft_list_to_char(t_cmd *cmmd,int size)
+char **ft_list_to_char(t_cmd *cmmd, int size)
 {
 	char **cmd;
 	int i;
 	i = 0;
 	cmd = (char **)malloc(sizeof(char *) * (size + 1));
-	if(!cmd)
+	if (!cmd)
 		return NULL;
-	while(cmmd && i <= size)
+	while (cmmd && i < size)
 	{
 		cmd[i] = cmmd->value;
 		cmmd = cmmd->next;
@@ -167,7 +170,6 @@ int main(int argc, char **argv, char **envp)
 				free(cmd);
 				cmd = temp;
 			}
-			else
 				continue;
 		}
 		if (cmd)
@@ -175,10 +177,10 @@ int main(int argc, char **argv, char **envp)
 			/*TODO : lola cmd khaseha av deyalha*/
 			data->cmd = cmd;
 			data->ac = ft_lst_size(cmd->cmd_lst);
-			data->av = ft_list_to_char(cmd->cmd_lst, data->ac - 1);
+			data->cmd->av = cmd->av;
 			data->size_cmds = ft_strlnode(data->cmd);
-			execution(data);
 			// print_command_structure(cmd);
+			execution(data);
 			if (line)
 				free(line);
 			// free_all_resources(cmd);
