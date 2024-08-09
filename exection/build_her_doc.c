@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/08 23:17:27 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/09 14:28:42 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,12 +64,15 @@ void	handle_child_process_her_doc(int pipe_fd[2], Redirection *redir,
 	}
 }
 
-void	handle_parent_process(t_data *data, int pipe_fd[2])
+void	handle_parent_process(t_data *data, int pipe_fd[2], Command *current_cmd)
 {
 	int	status;
 
+	(void)current_cmd;
 	close(pipe_fd[1]);
-	data->cmd->fdin = pipe_fd[0];
+	current_cmd->fdin = pipe_fd[0];
+	dprintf(2, "pipe_fd [%d]\n", pipe_fd[0]);
+	dprintf(2, "fdin [%d]\n", current_cmd->fdin);
 	waitpid(data->pid, &status, 0);
 	if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
 	{
@@ -78,7 +81,7 @@ void	handle_parent_process(t_data *data, int pipe_fd[2])
 	}
 }
 
-void	handle_heredoc(t_data *data, Redirection *redir)
+void	handle_heredoc(t_data *data, Redirection *redir, Command *current_cmd)
 {
 	int	pipe_fd[2];
 
@@ -101,5 +104,5 @@ void	handle_heredoc(t_data *data, Redirection *redir)
 	if (data->pid == 0)
 		handle_child_process_her_doc(pipe_fd, redir, data);
 	else
-		handle_parent_process(data, pipe_fd);
+		handle_parent_process(data, pipe_fd, current_cmd);
 }

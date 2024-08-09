@@ -12,11 +12,11 @@
 
 #include "minishell.h"
 
-t_data	g_data;
+t_data g_data;
 
-void	free_split(char **arr)
+void free_split(char **arr)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	if (arr != NULL)
@@ -30,17 +30,17 @@ void	free_split(char **arr)
 	}
 }
 
-void	print_redirection(Redirection *redir)
+void print_redirection(Redirection *redir)
 {
 	while (redir)
 	{
 		printf("  Redirection: Type=%d, Filename=%s\n", redir->type,
-			redir->filename);
+			   redir->filename);
 		redir = redir->next;
 	}
 }
 
-void	print_command_structure(Command *cmd)
+void print_command_structure(Command *cmd)
 {
 	while (cmd)
 	{
@@ -79,24 +79,25 @@ void	print_command_structure(Command *cmd)
 	}
 }
 
-int	check_parse(Redirection *redir)
+int check_parse(Redirection *redir)
 {
-	Redirection	*temp;
+	Redirection *temp;
 
 	temp = redir;
 	while (temp)
 	{
 		if (!ft_strcmp(temp->filename, "#"))
 			return (ft_putstr_fd("syntax error near unexpected token `newline'\n",
-					2), 1);
+								 2),
+					1);
 		temp = temp->next;
 	}
 	return (0);
 }
 
-size_t	ft_lst_size(t_cmd *cmd)
+size_t ft_lst_size(t_cmd *cmd)
 {
-	size_t	len;
+	size_t len;
 
 	len = 0;
 	while (cmd)
@@ -107,10 +108,10 @@ size_t	ft_lst_size(t_cmd *cmd)
 	return (len);
 }
 
-char	**ft_list_to_char(t_cmd *cmmd, int size)
+char **ft_list_to_char(t_cmd *cmmd, int size)
 {
-	char	**cmd;
-	int		i;
+	char **cmd;
+	int i;
 
 	i = 0;
 	cmd = (char **)malloc(sizeof(char *) * (size + 1));
@@ -126,14 +127,14 @@ char	**ft_list_to_char(t_cmd *cmmd, int size)
 	return (cmd);
 }
 
-int	main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp)
 {
-	Token	tokens[MAX_TOKENS];
-	Command	*cmd;
-	t_data	*data;
-	char	*line;
-	int		nb_token;
-		// int i;
+	Token tokens[MAX_TOKENS];
+	Command *cmd;
+	t_data *data;
+	char *line;
+	int nb_token;
+	// int i;
 
 	// Command	*temp;
 	(void)argc;
@@ -146,16 +147,15 @@ int	main(int argc, char **argv, char **envp)
 		signal(SIGQUIT, SIG_IGN);
 		line = readline("\033[32mminishell> \033[0m");
 		if (!line)
-			break ;
+			break;
 		if (strlen(line) > 0)
 			add_history(line);
 		signal(SIGINT, SIG_IGN);
 		nb_token = 0;
-		if (lex(line, tokens, &nb_token, data->env_list)
-			|| (check_syntaxe(tokens, nb_token)))
+		if (lex(line, tokens, &nb_token, data->env_list) || (check_syntaxe(tokens, nb_token)))
 		{
 			free(line);
-			continue ;
+			continue;
 		}
 		// i = 0;
 		// while (tokens[i].type != TOKEN_END)

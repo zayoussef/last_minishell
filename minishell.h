@@ -219,7 +219,7 @@ void add_token(Token *tokens, int *num_tokens, TokenType type, char *value);
 void skip_whitespace(const char **p);
 void handle_redirection(Token *tokens, int *i, Command **current);
 char *expand_variable(const char *start, int length, t_env_node *env);
-void handle_heredoc(t_data *data, Redirection *redir);
+void handle_heredoc(t_data *data, Redirection *redir, Command *current_cmd);
 /******************** Redirection Parsing Functions ********************/
 void					redirection_in_out(t_data *data, Command *cmd);
 void					open_check_redirections(t_data *data);
@@ -257,12 +257,11 @@ char					*find_path(char *cmd, char **env);
 void					handle_exec_error(char *cmd);
 void					handle_is_directory(char *exec_path);
 void					handle_child_process(t_data *data, int pipe_fd[2]);
-void					handle_parent_process(t_data *data, int pipe_fd[2]);
+void					handle_parent_process(t_data *data, int pipe_fd[2], Command *current_cmd);
 void					ft_dup_in(t_data *data);
 void					ft_dup_out(t_data *data, int i);
 void					setup_input(t_data *data);
 void					setup_output(t_data *data, int pipe_fd[2]);
-void					handle_heredoc(t_data *data, Redirection *redir);
 void					handle_all_heredocs(t_data *data);
 void					handle_heredoc_error(int pipe_fd[2], char *line);
 void					process_heredoc_line(char *line, Redirection *redir,
