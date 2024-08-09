@@ -14,32 +14,32 @@
 
 void	wating_processes(t_data *data, int *status)
 {
-    pid_t	pid;
-    int wstatus;
-    int i;
+	pid_t	pid;
+	int		wstatus;
+	int		i;
 
-    i = 0;
-    waitpid(data->pid, status, 0);
-    while (++i < data->size_cmds)
-    {
-        pid = wait(&wstatus);
-        if (pid == -1)
-            continue ;
-        if (WIFEXITED(wstatus))
-            *status = WEXITSTATUS(wstatus);
-        else if (WIFSIGNALED(wstatus))
-        {
-            if (WTERMSIG(wstatus) == SIGQUIT)
-                ft_putstr_fd("Quit (core dumped)\n", 2);
-            else if (WTERMSIG(wstatus) == SIGINT)
-                ft_putstr_fd("\n", 2);
-            *status = 128 + WTERMSIG(wstatus);
-        }
-    }
-    data->exit_status = *status;
+	i = 0;
+	waitpid(data->pid, status, 0);
+	while (++i < data->size_cmds)
+	{
+		pid = wait(&wstatus);
+		if (pid == -1)
+			continue ;
+		if (WIFEXITED(wstatus))
+			*status = WEXITSTATUS(wstatus);
+		else if (WIFSIGNALED(wstatus))
+		{
+			if (WTERMSIG(wstatus) == SIGQUIT)
+				ft_putstr_fd("Quit (core dumped)\n", 2);
+			else if (WTERMSIG(wstatus) == SIGINT)
+				ft_putstr_fd("\n", 2);
+			*status = 128 + WTERMSIG(wstatus);
+		}
+	}
+	data->exit_status = *status;
 }
 
-void handle_exec_error(char *cmd)
+void	handle_exec_error(char *cmd)
 {
 	ft_putstr_fd("minishell: ", 2);
 	ft_putstr_fd(cmd, 2);
@@ -47,7 +47,7 @@ void handle_exec_error(char *cmd)
 	exit(127);
 }
 
-void handle_is_directory(char *exec_path)
+void	handle_is_directory(char *exec_path)
 {
 	ft_putstr_fd("minishell: ", 2);
 	ft_putstr_fd(exec_path, 2);
@@ -56,13 +56,13 @@ void handle_is_directory(char *exec_path)
 	exit(126);
 }
 
-void run_execution(t_data *data)
+void	run_execution(t_data *data)
 {
-	char *exec_path;
-	struct stat path_stat;
+	char		*exec_path;
+	struct stat	path_stat;
 
 	if (!data->cmd || !data->cmd->av[0] || data->cmd->av[0][0] == '\0')
-		return;
+		return ;
 	data->env = list_to_char(data->env_list);
 	exec_path = find_path(data->cmd->av[0], data->env);
 	if (!exec_path)

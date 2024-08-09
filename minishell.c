@@ -12,11 +12,11 @@
 
 #include "minishell.h"
 
-t_data g_data;
+t_data	g_data;
 
-void free_split(char **arr)
+void	free_split(char **arr)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (arr != NULL)
@@ -30,23 +30,22 @@ void free_split(char **arr)
 	}
 }
 
-void print_redirection(Redirection *redir)
+void	print_redirection(Redirection *redir)
 {
 	while (redir)
 	{
 		printf("  Redirection: Type=%d, Filename=%s\n", redir->type,
-			   redir->filename);
+			redir->filename);
 		redir = redir->next;
 	}
 }
 
-void print_command_structure(Command *cmd)
+void	print_command_structure(Command *cmd)
 {
 	while (cmd)
 	{
 		// Print command arguments
 		printf("Command: ");
-
 		while (cmd->cmd_lst)
 		{
 			if (cmd->type == TOKEN_AMBIGUOUS)
@@ -61,7 +60,7 @@ void print_command_structure(Command *cmd)
 		printf("File descriptors:\n");
 		printf("  fdin: %d\n", cmd->fdin);
 		printf("  fdout: %d\n", cmd->fdout);
-		printf("  redir_erros: %d\n", cmd->redir_erros);
+		printf("  redir_errors: %d\n", cmd->redir_errors);
 		// Print heredoc redirections
 		if (cmd->heredoc)
 		{
@@ -80,42 +79,43 @@ void print_command_structure(Command *cmd)
 	}
 }
 
-int check_parse(Redirection *redir)
+int	check_parse(Redirection *redir)
 {
-	Redirection *temp;
+	Redirection	*temp;
 
 	temp = redir;
 	while (temp)
 	{
 		if (!ft_strcmp(temp->filename, "#"))
 			return (ft_putstr_fd("syntax error near unexpected token `newline'\n",
-								 2),
-					1);
+					2), 1);
 		temp = temp->next;
 	}
 	return (0);
 }
 
-size_t ft_lst_size(t_cmd *cmd)
+size_t	ft_lst_size(t_cmd *cmd)
 {
-	size_t len;
+	size_t	len;
+
 	len = 0;
 	while (cmd)
 	{
 		len++;
 		cmd = cmd->next;
 	}
-	return len;
+	return (len);
 }
 
-char **ft_list_to_char(t_cmd *cmmd, int size)
+char	**ft_list_to_char(t_cmd *cmmd, int size)
 {
-	char **cmd;
-	int i;
+	char	**cmd;
+	int		i;
+
 	i = 0;
 	cmd = (char **)malloc(sizeof(char *) * (size + 1));
 	if (!cmd)
-		return NULL;
+		return (NULL);
 	while (cmmd && i < size)
 	{
 		cmd[i] = cmmd->value;
@@ -123,23 +123,24 @@ char **ft_list_to_char(t_cmd *cmmd, int size)
 		i++;
 	}
 	cmd[i] = NULL;
-	return cmd;
+	return (cmd);
 }
-void ft_reset_file(Command *cmd)
+void	ft_reset_file(Command *cmd)
 {
 	dup2(cmd->fdin, 0);
 	dup2(cmd->fdout, 1);
 }
 
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
-	Token tokens[MAX_TOKENS];
-	Command *cmd;
-	t_data *data;
-	char *line;
-	int nb_token;
-	Command *temp;
+	Token	tokens[MAX_TOKENS];
+	Command	*cmd;
+	t_data	*data;
+	char	*line;
+	int		nb_token;
+		// int i;
 
+	// Command	*temp;
 	(void)argc;
 	(void)argv;
 	data = get_global_data();
@@ -150,32 +151,41 @@ int main(int argc, char **argv, char **envp)
 		signal(SIGQUIT, SIG_DFL);
 		line = readline("\033[32mminishell> \033[0m");
 		if (!line)
-			break;
+			break ;
 		if (strlen(line) > 0)
 			add_history(line);
 		signal(SIGINT, SIG_IGN);
 		nb_token = 0;
-		if (lex(line, tokens, &nb_token, data->env_list) || (check_syntaxe(tokens, nb_token)))
+		if (lex(line, tokens, &nb_token, data->env_list)
+			|| (check_syntaxe(tokens, nb_token)))
 		{
 			free(line);
-			continue;
+			continue ;
 		}
+		// i = 0;
+		// while (tokens[i].type != TOKEN_END)
+		// {
+		// 	printf("token value:%s\n", tokens[i].value);
+		// 	if (!ft_strcmp(tokens[i].value, "#"))
+		// 		printf("token value type %d\n", tokens[i].type);
+		// 	i++;
+		// }
 		cmd = parse(tokens);
-		if (cmd && check_parse(cmd->redirection) == 1)
-		{
-			free_redirection(cmd->redirection);
-			if (cmd->next)
-			{
-				temp = cmd->next;
-				free(cmd);
-				cmd = temp;
-			}
-				continue;
-		}
+		// if (cmd && check_parse(cmd->redirection) == 1)
+		// {
+		// 	free_redirection(cmd->redirection);
+		// 	if (cmd->next)
+		// 	{
+		// 		temp = cmd->next;
+		// 		free(cmd);
+		// 		cmd = temp;
+		// 	}
+		// 	continue ;
+		// }
 		if (cmd)
 		{
 			data->cmd = cmd;
-			data->her_erros = 0;
+			data->her_errors = 0;
 			data->ac = ft_lst_size(cmd->cmd_lst);
 			data->cmd->av = cmd->av;
 			data->size_cmds = ft_strlnode(data->cmd);
