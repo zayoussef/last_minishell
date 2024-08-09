@@ -143,7 +143,7 @@ int	main(int argc, char **argv, char **envp)
 	while (1)
 	{
 		signal(SIGINT, handle_sigint);
-		signal(SIGQUIT, SIG_DFL);
+		signal(SIGQUIT, SIG_IGN);
 		line = readline("\033[32mminishell> \033[0m");
 		if (!line)
 			break ;

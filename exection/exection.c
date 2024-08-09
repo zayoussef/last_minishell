@@ -6,7 +6,7 @@
 /*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 15:42:06 by yozainan          #+#    #+#             */
-/*   Updated: 2024/08/09 09:56:52 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/09 11:13:37 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,10 @@
 void init_execution(t_data *data, int *status)
 {
     if (data->size_cmds == 1)
-        singel_cmd(data, status);
+    {
+        if (data->cmd->redir_errors == 0)
+            singel_cmd(data, status);
+    }
     else
     {
         while (data->cmd != NULL)
@@ -35,7 +38,9 @@ void handle_invalid_redirection(t_data *data, Command *cmd,
     {
         ft_putstr_fd("minishell: ", 2);
         ft_putstr_fd(": No such file or directory\n", 2);
+        
         data->exit_status = 1;
+        data->cmd->redir_errors = 1;
         cmd->dup = 1;
     }
 }
@@ -52,6 +57,7 @@ void check_invalid_redirections(t_data *data)
         {
             ft_putstr_fd("minishell: ambiguous redirect\n", 2);
             data->exit_status = 1;
+            data->cmd->redir_errors = 1;
             data->cmd->dup = 1;
             return;
         }
@@ -103,11 +109,9 @@ void execution(t_data *data)
     check_invalid_redirections(data);
     if (data->cmd->dup != 1)
         open_check_redirections(data);
-    while (data->cmd && data->cmd->redir_errors == -1)
-        data->cmd = data->cmd->next;
-    if (!data->cmd)
-        return;
     data->is_pipeline = (data->size_cmds > 1);
+    if (!data->cmd)
+        return ;
     init_execution(data, &status);
     wating_processes(data, &status);
 }

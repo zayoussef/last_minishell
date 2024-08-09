@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   open_file.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: elchakir <elchakir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/09 06:06:54 by elchakir         ###   ########.fr       */
+/*   Updated: 2024/08/09 10:43:22 by yozainan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,9 +79,6 @@ void	redirection_in_out(t_data *data, Command *cmd)
 			if (cmd->redir_errors == -1)
 				return ;
 		}
-		check_permissions(data, cmd, redir->type);
-		if (cmd->redir_errors == -1)
-			return ;
 		handle_other_redirects(data, cmd, redir);
 		if (cmd->redir_errors == -1)
 			return ;
