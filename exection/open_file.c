@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   open_file.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yozainan <yozainan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: elchakir <elchakir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/11 17:20:21 by elchakir          #+#    #+#             */
-/*   Updated: 2024/08/09 09:43:22 by yozainan         ###   ########.fr       */
+/*   Updated: 2024/08/09 06:06:54 by elchakir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ void	open_file(t_data *data, Command *cmd, Redirection *redir)
 	int	fd;
 
 	fd = -1;
-	if (!ft_strcmp(redir->filename, ""))
+	if (!ft_strcmp(redir->filename, "") || !ft_strcmp(redir->filename,
+			""))
 		return ;
 	if (redir->type == TOKEN_REDIRECT_IN)
 		fd = open(redir->filename, O_RDONLY);

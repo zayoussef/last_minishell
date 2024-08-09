@@ -125,11 +125,6 @@ char	**ft_list_to_char(t_cmd *cmmd, int size)
 	cmd[i] = NULL;
 	return (cmd);
 }
-void	ft_reset_file(Command *cmd)
-{
-	dup2(cmd->fdin, 0);
-	dup2(cmd->fdout, 1);
-}
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -171,17 +166,7 @@ int	main(int argc, char **argv, char **envp)
 		// 	i++;
 		// }
 		cmd = parse(tokens);
-		// if (cmd && check_parse(cmd->redirection) == 1)
-		// {
-		// 	free_redirection(cmd->redirection);
-		// 	if (cmd->next)
-		// 	{
-		// 		temp = cmd->next;
-		// 		free(cmd);
-		// 		cmd = temp;
-		// 	}
-		// 	continue ;
-		// }
+
 		if (cmd)
 		{
 			data->cmd = cmd;
